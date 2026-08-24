@@ -121,6 +121,7 @@
   .btn:disabled{opacity:.55;cursor:not-allowed}
   .btn-sm{padding:8px 12px;font-size:13px;border-radius:9px}
   .btn-block{width:100%}
+  .btn.icon-only{padding:8px;width:36px;flex:none}
 
   .msg{
     font-size:13px;border-radius:10px;padding:10px 13px;margin-bottom:14px;
@@ -369,6 +370,9 @@
       </div>
       <div class="who">
         <div class="name"><b id="whoName">—</b><span class="role" id="whoRole">—</span></div>
+        <button class="icon-btn" id="myProfileBtn" title="ویرایش حساب من">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+        </button>
         <button class="icon-btn" id="logoutBtn" title="خروج">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
         </button>
@@ -388,7 +392,9 @@
         <div class="search-box">
           <input id="searchInput" type="text" placeholder="جستجو بر اساس نام، کد شهریه، گروه، شماره اتاق...">
         </div>
-        <button class="btn btn-gold btn-sm" id="refreshBtn">بازخوانی</button>
+        <button class="btn btn-gold btn-sm icon-only" id="refreshBtn" title="بازخوانی" aria-label="بازخوانی">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
       </div>
       <div class="toolbar" style="margin-bottom:14px">
         <button class="btn btn-ghost btn-sm" style="flex:1" id="exportExcelBtn">📊 خروجی اکسل</button>
@@ -453,8 +459,8 @@
       </div>
 
       <div class="form-card" style="margin-bottom:16px">
-        <h2>افزودن ادمین جدید</h2>
-        <p class="hint">یک حساب کاربری برای همکار جدید بساز.</p>
+        <h2 id="adminFormTitle">افزودن ادمین جدید</h2>
+        <p class="hint" id="adminFormHint">یک حساب کاربری برای همکار جدید بساز.</p>
         <div class="grid2">
           <div class="field">
             <label>نام و نام خانوادگی</label>
@@ -465,7 +471,7 @@
             <input id="a_username" type="text" placeholder="حداقل ۳ کاراکتر" dir="ltr" style="text-align:right">
           </div>
           <div class="field">
-            <label>رمز عبور</label>
+            <label id="a_password_label">رمز عبور</label>
             <input id="a_password" type="text" placeholder="حداقل ۴ کاراکتر" dir="ltr" style="text-align:right">
           </div>
           <div class="field">
@@ -477,7 +483,10 @@
           </div>
         </div>
         <div class="msg error" id="adminMsg"></div>
-        <button class="btn btn-primary btn-block" id="addAdminBtn">افزودن ادمین</button>
+        <div class="form-actions" style="margin-top:14px">
+          <button class="btn btn-primary btn-block" id="addAdminBtn">افزودن ادمین</button>
+          <button class="btn btn-ghost" id="cancelEditAdminBtn" style="display:none">انصراف</button>
+        </div>
       </div>
 
       <div id="adminsListWrap"></div>
@@ -493,6 +502,31 @@
     <div class="modal-actions">
       <button class="btn btn-danger btn-block" id="confirmYes">بله، حذف کن</button>
       <button class="btn btn-ghost btn-block" id="confirmNo">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<!-- profile edit modal -->
+<div class="modal-bg" id="profileModal">
+  <div class="modal">
+    <h3>ویرایش حساب من</h3>
+    <p>برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذارید.</p>
+    <div class="field">
+      <label>نام و نام خانوادگی</label>
+      <input id="p_full_name" type="text">
+    </div>
+    <div class="field">
+      <label>نام کاربری</label>
+      <input id="p_username" type="text" dir="ltr" style="text-align:right">
+    </div>
+    <div class="field">
+      <label>رمز عبور جدید</label>
+      <input id="p_password" type="text" placeholder="خالی = بدون تغییر" dir="ltr" style="text-align:right">
+    </div>
+    <div class="msg error" id="profileMsg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-block" id="profileSaveBtn">ذخیره تغییرات</button>
+      <button class="btn btn-ghost btn-block" id="profileCancelBtn">انصراف</button>
     </div>
   </div>
 </div>
@@ -613,7 +647,7 @@ document.getElementById("tabs").addEventListener("click", e=>{
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.getElementById("sec-"+btn.dataset.tab).classList.add("active");
   if(btn.dataset.tab === "add" && !editingId) resetForm();
-  if(btn.dataset.tab === "admins") loadAdmins();
+  if(btn.dataset.tab === "admins"){ if(!editingAdminId) resetAdminForm(); loadAdmins(); }
 });
 function goTab(tab){
   document.querySelector(`#tabs button[data-tab="${tab}"]`).click();
@@ -927,13 +961,16 @@ window.askDeleteStudent = function(id, name){
 }
 
 /* ========================= مدیریت ادمین‌ها ========================= */
+let admins = [];
+let editingAdminId = null;
+
 async function loadAdmins(){
   if(!session.admin.is_super) return;
   const wrap = document.getElementById("adminsListWrap");
   wrap.innerHTML = `<div class="skeleton" style="height:60px"></div>`;
   try{
-    const list = await callRpc("rpc_list_admins", { p_token: session.token });
-    renderAdmins(list || []);
+    admins = await callRpc("rpc_list_admins", { p_token: session.token }) || [];
+    renderAdmins(admins);
   }catch(err){
     wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
   }
@@ -947,10 +984,51 @@ function renderAdmins(list){
         <b>${esc(a.full_name)} ${a.is_super ? '<span class="super-tag">سوپر ادمین</span>' : ''}</b>
         <span dir="ltr">@${esc(a.username)}</span>
       </div>
-      ${a.id === session.admin.id ? '' : `<button class="btn btn-danger btn-sm" onclick="askDeleteAdmin('${a.id}','${esc(a.full_name)}')">حذف</button>`}
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="startEditAdmin('${a.id}')">ویرایش</button>
+        ${a.id === session.admin.id ? '' : `<button class="btn btn-danger btn-sm" onclick="askDeleteAdmin('${a.id}','${esc(a.full_name)}')">حذف</button>`}
+      </div>
     </div>
   `).join("");
 }
+
+function resetAdminForm(){
+  editingAdminId = null;
+  document.getElementById("adminFormTitle").textContent = "افزودن ادمین جدید";
+  document.getElementById("adminFormHint").textContent = "یک حساب کاربری برای همکار جدید بساز.";
+  document.getElementById("addAdminBtn").textContent = "افزودن ادمین";
+  document.getElementById("cancelEditAdminBtn").style.display = "none";
+  document.getElementById("a_password_label").textContent = "رمز عبور";
+  document.getElementById("a_password").placeholder = "حداقل ۴ کاراکتر";
+  document.getElementById("a_full_name").value = "";
+  document.getElementById("a_username").value = "";
+  document.getElementById("a_password").value = "";
+  document.getElementById("a_is_super").value = "false";
+  document.getElementById("a_is_super").disabled = false;
+  showMsg("adminMsg","");
+}
+
+window.startEditAdmin = function(id){
+  const a = admins.find(x => x.id === id);
+  if(!a) return;
+  editingAdminId = id;
+  document.getElementById("adminFormTitle").textContent = "ویرایش ادمین";
+  document.getElementById("adminFormHint").textContent = "برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذار.";
+  document.getElementById("addAdminBtn").textContent = "ذخیره تغییرات";
+  document.getElementById("cancelEditAdminBtn").style.display = "inline-flex";
+  document.getElementById("a_password_label").textContent = "رمز عبور جدید";
+  document.getElementById("a_password").placeholder = "خالی = بدون تغییر";
+  document.getElementById("a_full_name").value = a.full_name || "";
+  document.getElementById("a_username").value = a.username || "";
+  document.getElementById("a_password").value = "";
+  document.getElementById("a_is_super").value = a.is_super ? "true" : "false";
+  // یک سوپر ادمین نمی‌تواند سطح دسترسی خودش را از همین‌جا پایین بیاورد
+  document.getElementById("a_is_super").disabled = (a.id === session.admin.id);
+  showMsg("adminMsg","");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.getElementById("cancelEditAdminBtn").addEventListener("click", resetAdminForm);
 
 document.getElementById("addAdminBtn").addEventListener("click", async ()=>{
   const full_name = document.getElementById("a_full_name").value.trim();
@@ -958,19 +1036,41 @@ document.getElementById("addAdminBtn").addEventListener("click", async ()=>{
   const password = document.getElementById("a_password").value;
   const is_super = document.getElementById("a_is_super").value === "true";
   showMsg("adminMsg","");
+
+  const btn = document.getElementById("addAdminBtn");
+
+  if(editingAdminId){
+    if(!full_name || !username){
+      showMsg("adminMsg","نام و نام کاربری الزامی است.");
+      return;
+    }
+    btn.disabled = true;
+    try{
+      await callRpc("rpc_update_admin", {
+        p_token: session.token, p_admin_id: editingAdminId,
+        p_full_name: full_name, p_username: username,
+        p_password: password || null, p_is_super: is_super
+      });
+      toast("اطلاعات ادمین ذخیره شد.");
+      resetAdminForm();
+      loadAdmins();
+    }catch(err){
+      showMsg("adminMsg", err.message);
+    }finally{
+      btn.disabled = false;
+    }
+    return;
+  }
+
   if(!full_name || !username || !password){
     showMsg("adminMsg","همه فیلدها الزامی است.");
     return;
   }
-  const btn = document.getElementById("addAdminBtn");
   btn.disabled = true;
   try{
     await callRpc("rpc_add_admin", { p_token: session.token, p_username: username, p_password: password, p_full_name: full_name, p_is_super: is_super });
     toast("ادمین جدید اضافه شد.");
-    document.getElementById("a_full_name").value = "";
-    document.getElementById("a_username").value = "";
-    document.getElementById("a_password").value = "";
-    document.getElementById("a_is_super").value = "false";
+    resetAdminForm();
     loadAdmins();
   }catch(err){
     showMsg("adminMsg", err.message);
@@ -990,6 +1090,50 @@ window.askDeleteAdmin = function(id, name){
     }
   });
 }
+
+/* ========================= ویرایش حساب خودم ========================= */
+document.getElementById("myProfileBtn").addEventListener("click", ()=>{
+  document.getElementById("p_full_name").value = session.admin.full_name || "";
+  document.getElementById("p_username").value = session.admin.username || "";
+  document.getElementById("p_password").value = "";
+  showMsg("profileMsg","");
+  document.getElementById("profileModal").classList.add("show");
+});
+document.getElementById("profileCancelBtn").addEventListener("click", ()=>{
+  document.getElementById("profileModal").classList.remove("show");
+});
+document.getElementById("profileModal").addEventListener("click", e=>{
+  if(e.target.id === "profileModal") document.getElementById("profileModal").classList.remove("show");
+});
+document.getElementById("profileSaveBtn").addEventListener("click", async ()=>{
+  const full_name = document.getElementById("p_full_name").value.trim();
+  const username = document.getElementById("p_username").value.trim();
+  const password = document.getElementById("p_password").value;
+  showMsg("profileMsg","");
+  if(!full_name || !username){
+    showMsg("profileMsg","نام و نام کاربری الزامی است.");
+    return;
+  }
+  const btn = document.getElementById("profileSaveBtn");
+  btn.disabled = true;
+  try{
+    const updated = await callRpc("rpc_update_admin", {
+      p_token: session.token, p_admin_id: session.admin.id,
+      p_full_name: full_name, p_username: username,
+      p_password: password || null, p_is_super: null
+    });
+    session.admin.full_name = updated.full_name;
+    session.admin.username = updated.username;
+    saveSession(session);
+    document.getElementById("whoName").textContent = session.admin.full_name;
+    document.getElementById("profileModal").classList.remove("show");
+    toast("اطلاعات حساب شما ذخیره شد.");
+  }catch(err){
+    showMsg("profileMsg", err.message);
+  }finally{
+    btn.disabled = false;
+  }
+});
 
 /* ========================= مودال تایید ========================= */
 function openConfirm(title, text, action){
