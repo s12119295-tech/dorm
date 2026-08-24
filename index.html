@@ -824,37 +824,20 @@ document.getElementById("exportPdfBtn").addEventListener("click", async ()=>{
   btn.disabled = true; const orig = btn.textContent; btn.textContent = "در حال ساخت...";
   try{
     const rows = exportRows();
-    const headers = ["عکس", ...Object.keys(rows[0])];
+    const headers = Object.keys(rows[0]);
     const holder = document.createElement("div");
-    holder.style.cssText = "position:fixed;left:-9999px;top:0;width:1050px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial";
+    holder.style.cssText = "position:fixed;left:-9999px;top:0;width:1000px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial";
     holder.innerHTML = `
       <div dir="rtl">
         <h2 style="text-align:center;margin:0 0 4px">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
         <p style="text-align:center;color:#666;margin:0 0 16px">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")} — تعداد: ${rows.length} نفر</p>
         <table dir="rtl" style="width:100%;border-collapse:collapse;font-size:13px">
           <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:8px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
-          <tbody>${rows.map((r,i)=>{
-            const st = students[i];
-            const photoCell = st && st.photo_url
-              ? `<img class="pdf-photo" src="${esc(st.photo_url)}" crossorigin="anonymous" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;margin:0 auto">`
-              : `<div style="width:34px;height:34px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">${esc((st && st.full_name || "?").trim().charAt(0))}</div>`;
-            return `<tr style="background:${i%2?'#F7F3EA':'#fff'}">
-              <td style="border:1px solid #999;padding:6px;text-align:center">${photoCell}</td>
-              ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}
-            </tr>`;
-          }).join("")}</tbody>
+          <tbody>${rows.map((r,i)=>`<tr style="background:${i%2?'#F7F3EA':'#fff'}">${headers.map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}</tr>`).join("")}</tbody>
         </table>
       </div>`;
     document.body.appendChild(holder);
-
-    const imgs = Array.from(holder.querySelectorAll("img.pdf-photo"));
-    await Promise.all(imgs.map(img => new Promise(resolve => {
-      if(img.complete){ resolve(); return; }
-      img.onload = () => resolve();
-      img.onerror = () => { img.style.display = "none"; resolve(); };
-    })));
-
-    const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff", useCORS: true });
+    const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff" });
     document.body.removeChild(holder);
 
     const { jsPDF } = window.jspdf;
