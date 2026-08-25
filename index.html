@@ -915,21 +915,71 @@ function setPhotoPreview(url){
   }
 }
 
-function readFileAsPhoto(file){
+const PHOTO_MAX_BYTES = 1.5 * 1024 * 1024; // 1.5MB
+
+function loadImageFromFile(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("فایل تصویری خوانده نشد")); };
+    img.src = url;
+  });
+}
+
+async function compressImageToDataURL(file, maxBytes = PHOTO_MAX_BYTES){
+  const img = await loadImageFromFile(file);
+  let { width, height } = img;
+  const maxDim = 1280;
+  if(width > maxDim || height > maxDim){
+    const ratio = Math.min(maxDim / width, maxDim / height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width; canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0, width, height);
+
+  let quality = 0.85;
+  let dataUrl = canvas.toDataURL("image/jpeg", quality);
+  while(dataUrl.length > maxBytes && quality > 0.35){
+    quality -= 0.1;
+    dataUrl = canvas.toDataURL("image/jpeg", quality);
+  }
+  while(dataUrl.length > maxBytes && (canvas.width > 400 || canvas.height > 400)){
+    canvas.width = Math.round(canvas.width * 0.85);
+    canvas.height = Math.round(canvas.height * 0.85);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    dataUrl = canvas.toDataURL("image/jpeg", quality);
+  }
+  return dataUrl;
+}
+
+async function readFileAsPhoto(file){
   if(!file || !file.type.startsWith("image/")){
     toast("لطفاً یک فایل تصویری انتخاب کنید.", true);
     return;
   }
-  if(file.size > 4 * 1024 * 1024){
-    toast("حجم عکس نباید بیشتر از ۴ مگابایت باشد.", true);
+  if(file.size > 20 * 1024 * 1024){
+    toast("حجم عکس نباید بیشتر از ۲۰ مگابایت باشد.", true);
     return;
   }
-  const reader = new FileReader();
-  reader.onload = () => {
-    setPhotoPreview(reader.result);
+  const dropText = document.getElementById("photoDropText");
+  const dropTextOrig = dropText.innerHTML;
+  dropText.innerHTML = `<span>در حال فشرده‌سازی عکس...</span>`;
+  try{
+    const dataUrl = await compressImageToDataURL(file);
+    setPhotoPreview(dataUrl);
     document.getElementById("f_photo_url").value = "";
-  };
-  reader.readAsDataURL(file);
+  }catch(err){
+    toast("خطا در پردازش عکس: " + err.message, true);
+    dropText.innerHTML = dropTextOrig;
+  }
 }
 
 (function initPhotoUpload(){
