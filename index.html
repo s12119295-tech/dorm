@@ -444,10 +444,11 @@
             <div id="photoDropText" class="photo-drop-text">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               <span>عکس را بکشید و رها کنید یا کلیک کنید</span>
+              <span style="opacity:.7;font-size:10.5px">فرمت‌های مجاز: PNG, WEBP, JPG, JPEG</span>
             </div>
             <button type="button" id="photoRemoveBtn" class="photo-remove" style="display:none" title="حذف عکس">✕</button>
           </div>
-          <input type="file" id="photoFileInput" accept="image/*" style="display:none">
+          <input type="file" id="photoFileInput" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" style="display:none">
           <div class="field" style="margin-top:8px">
             <label>یا لینک عکس را وارد کنید</label>
             <input id="f_photo_url" type="text" placeholder="https://example.com/photo.jpg" dir="ltr" style="text-align:right">
@@ -627,8 +628,11 @@ function showMsg(id, text){
 function esc(s){
   return (s ?? "").toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-async function callRpc(name, params){
-  const { data, error } = await sb.rpc(name, params);
+async function callRpc(name, params, timeoutMs = 20000){
+  const timeout = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error("درخواست بیش از حد طول کشید. اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.")), timeoutMs);
+  });
+  const { data, error } = await Promise.race([sb.rpc(name, params), timeout]);
   if(error) throw new Error(error.message || "خطایی رخ داد.");
   return data;
 }
@@ -961,8 +965,11 @@ async function compressImageToDataURL(file, maxBytes = PHOTO_MAX_BYTES){
 }
 
 async function readFileAsPhoto(file){
-  if(!file || !file.type.startsWith("image/")){
-    toast("لطفاً یک فایل تصویری انتخاب کنید.", true);
+  const allowedTypes = ["image/png", "image/webp", "image/jpeg"];
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  const allowedExts = ["png", "webp", "jpg", "jpeg"];
+  if(!file || !(allowedTypes.includes(file.type) || allowedExts.includes(ext))){
+    toast("فقط فرمت‌های PNG، WEBP، JPG و JPEG مجاز است.", true);
     return;
   }
   if(file.size > 20 * 1024 * 1024){
@@ -1130,7 +1137,8 @@ document.getElementById("saveBtn").addEventListener("click", async ()=>{
   }
   showMsg("formMsg","");
   const btn = document.getElementById("saveBtn");
-  btn.disabled = true;
+  const btnOrigText = btn.textContent;
+  btn.disabled = true; btn.textContent = "در حال ذخیره...";
   try{
     if(editingId){
       await callRpc("rpc_update_student", { p_token: session.token, p_id: editingId, p_data: payload });
@@ -1144,6 +1152,7 @@ document.getElementById("saveBtn").addEventListener("click", async ()=>{
     goTab("list");
   }catch(err){
     showMsg("formMsg", err.message);
+    btn.textContent = btnOrigText;
   }finally{
     btn.disabled = false;
   }
