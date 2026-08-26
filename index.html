@@ -6,1389 +6,1941 @@
 <title>خوابگاه مدرسه آیت‌الله خویی</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+</script>
 <style>
-  :root{
-    --teal-deep:#0F3A3A;
-    --teal-mid:#155050;
-    --teal-soft:#1E6363;
-    --gold:#C9A15B;
-    --gold-soft:#E4C98A;
-    --cream:#F7F3EA;
-    --paper:#FFFCF5;
-    --ink:#1C2321;
-    --ink-soft:#5B6560;
-    --line:#E2D9C2;
-    --danger:#B3462C;
-    --ok:#2F6E4F;
-    --radius:16px;
-    --shadow:0 10px 30px -12px rgba(15,58,58,.25);
+  :root {
+    --teal-deep: #0F3A3A;
+    --teal-mid: #155050;
+    --teal-soft: #1E6363;
+    --gold: #C9A15B;
+    --gold-soft: #E4C98A;
+    --cream: #F7F3EA;
+    --paper: #FFFCF5;
+    --ink: #1C2321;
+    --ink-soft: #5B6560;
+    --line: #E2D9C2;
+    --danger: #B3462C;
+    --ok: #2F6E4F;
+    --radius: 16px;
+    --shadow: 0 10px 30px -12px rgba(15, 58, 58, .25);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    background:var(--cream);
-    color:var(--ink);
-    font-family:'Vazirmatn',system-ui,sans-serif;
-    min-height:100vh;
-    -webkit-tap-highlight-color:transparent;
+  * {
+    box-sizing: border-box
   }
-  button,input{font-family:inherit}
-  ::selection{background:var(--gold-soft)}
+  html,
+  body {
+    margin: 0;
+    padding: 0
+  }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  input {
+    font-family: inherit
+  }
+  ::selection {
+    background: var(--gold-soft)
+  }
 
   /* ---------- girih star mark ---------- */
-  .mark{width:30px;height:30px;flex:none}
-  .mark path{fill:var(--gold)}
+  .mark {
+    width: 30px;
+    height: 30px;
+    flex: none
+  }
+  .mark path {
+    fill: var(--gold)
+  }
 
   /* ---------- login screen ---------- */
-  .login-wrap{
-    min-height:100vh;
-    display:flex;align-items:center;justify-content:center;
-    padding:24px;
-    background:
-      radial-gradient(1200px 600px at 20% -10%, rgba(201,161,91,.15), transparent 60%),
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(201, 161, 91, .15), transparent 60%),
       var(--teal-deep);
-    position:relative;
-    overflow:hidden;
+    position: relative;
+    overflow: hidden;
   }
-  .login-wrap::before{
-    content:"";
-    position:absolute;inset:0;
-    opacity:.14;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23C9A15B' stroke-width='1'%3E%3Cpath d='M60 5 L96 30 L96 90 L60 115 L24 90 L24 30 Z'/%3E%3Cpath d='M60 5 L60 115 M24 30 L96 90 M96 30 L24 90'/%3E%3C/g%3E%3C/svg%3E");
-    background-size:140px 140px;
+  .login-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .14;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23C9A15B' stroke-width='1'%3E%3Cpath d='M60 5 L96 30 L96 90 L60 115 L24 90 L24 30 Z'/%3E%3Cpath d='M60 5 L60 115 M24 30 L96 90 M96 30 L24 90'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 140px 140px;
   }
-  .login-card{
-    position:relative;
-    width:100%;max-width:380px;
-    background:var(--paper);
-    border-radius:22px;
-    padding:34px 26px 28px;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.5);
-    border:1px solid rgba(201,161,91,.35);
+  .login-card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: var(--paper);
+    border-radius: 22px;
+    padding: 34px 26px 28px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .5);
+    border: 1px solid rgba(201, 161, 91, .35);
   }
-  .login-badge{
-    width:64px;height:64px;border-radius:50%;
-    background:linear-gradient(160deg,var(--teal-mid),var(--teal-deep));
-    display:flex;align-items:center;justify-content:center;
-    margin:0 auto 14px;
-    box-shadow:0 8px 20px -6px rgba(15,58,58,.5);
+  .login-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--teal-mid), var(--teal-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 20px -6px rgba(15, 58, 58, .5);
   }
-  .login-badge .mark{width:34px;height:34px}
-  .login-badge .mark path{fill:var(--gold-soft)}
-  h1.brand{
-    font-size:19px;font-weight:800;text-align:center;margin:0 0 2px;
-    letter-spacing:.2px;
+  .login-badge .mark {
+    width: 34px;
+    height: 34px
   }
-  p.sub{
-    text-align:center;color:var(--ink-soft);font-size:13px;margin:0 0 26px;
+  .login-badge .mark path {
+    fill: var(--gold-soft)
   }
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
-  .field input, .field select{
-    width:100%;padding:12px 14px;border-radius:11px;
-    border:1.5px solid var(--line);background:#fff;
-    font-size:15px;color:var(--ink);
-    transition:border-color .15s, box-shadow .15s;
+  h1.brand {
+    font-size: 19px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 2px;
+    letter-spacing: .2px;
   }
-  .field input:focus, .field select:focus{
-    outline:none;border-color:var(--gold);
-    box-shadow:0 0 0 4px rgba(201,161,91,.18);
+  p.sub {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0 0 26px;
   }
-  .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    border:none;border-radius:12px;cursor:pointer;
-    font-weight:700;font-size:14.5px;padding:13px 18px;
-    transition:transform .12s ease, box-shadow .12s ease, opacity .12s;
+  .field {
+    margin-bottom: 14px
   }
-  .btn:active{transform:scale(.97)}
-  .btn-primary{
-    width:100%;color:#fff;
-    background:linear-gradient(160deg,var(--teal-soft),var(--teal-deep));
-    box-shadow:0 10px 20px -8px rgba(15,58,58,.55);
+  .field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 6px
   }
-  .btn-gold{
-    background:linear-gradient(160deg,var(--gold-soft),var(--gold));
-    color:var(--teal-deep);
+  .field input,
+  .field select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 11px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 15px;
+    color: var(--ink);
+    transition: border-color .15s, box-shadow .15s;
   }
-  .btn-ghost{
-    background:transparent;border:1.5px solid var(--line);color:var(--ink);
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201, 161, 91, .18);
   }
-  .btn-danger{background:rgba(179,70,44,.1);color:var(--danger)}
-  .btn:disabled{opacity:.55;cursor:not-allowed}
-  .btn-sm{padding:8px 12px;font-size:13px;border-radius:9px}
-  .btn-block{width:100%}
-  .btn.icon-only{padding:8px;width:36px;flex:none}
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 13px 18px;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s;
+  }
+  .btn:active {
+    transform: scale(.97)
+  }
+  .btn-primary {
+    width: 100%;
+    color: #fff;
+    background: linear-gradient(160deg, var(--teal-soft), var(--teal-deep));
+    box-shadow: 0 10px 20px -8px rgba(15, 58, 58, .55);
+  }
+  .btn-gold {
+    background: linear-gradient(160deg, var(--gold-soft), var(--gold));
+    color: var(--teal-deep);
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+  }
+  .btn-danger {
+    background: rgba(179, 70, 44, .1);
+    color: var(--danger)
+  }
+  .btn:disabled {
+    opacity: .55;
+    cursor: not-allowed
+  }
+  .btn-sm {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 9px
+  }
+  .btn-block {
+    width: 100%
+  }
+  .btn.icon-only {
+    padding: 8px;
+    width: 36px;
+    flex: none
+  }
 
-  .msg{
-    font-size:13px;border-radius:10px;padding:10px 13px;margin-bottom:14px;
-    display:none;
+  .msg {
+    font-size: 13px;
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin-bottom: 14px;
+    display: none;
   }
-  .msg.show{display:block}
-  .msg.error{background:rgba(179,70,44,.1);color:var(--danger)}
-  .msg.ok{background:rgba(47,110,79,.1);color:var(--ok)}
+  .msg.show {
+    display: block
+  }
+  .msg.error {
+    background: rgba(179, 70, 44, .1);
+    color: var(--danger)
+  }
+  .msg.ok {
+    background: rgba(47, 110, 79, .1);
+    color: var(--ok)
+  }
 
   /* ---------- app shell ---------- */
-  #app{display:none;min-height:100vh;flex-direction:column}
-  #app.show{display:flex}
-
-  header.topbar{
-    background:linear-gradient(155deg,var(--teal-mid),var(--teal-deep));
-    color:#fff;
-    padding:16px 18px 14px;
-    position:sticky;top:0;z-index:20;
-    box-shadow:0 6px 18px -10px rgba(0,0,0,.4);
+  #app {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column
   }
-  .topbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .topbar-title{display:flex;align-items:center;gap:10px}
-  .topbar-title .mark{width:26px;height:26px}
-  .topbar-title .mark path{fill:var(--gold-soft)}
-  .topbar-title h1{font-size:15.5px;font-weight:800;margin:0;line-height:1.3}
-  .topbar-title span{display:block;font-size:11px;font-weight:400;color:var(--gold-soft);opacity:.9}
-  .who{display:flex;align-items:center;gap:8px}
-  .who .name{font-size:12.5px;text-align:left;line-height:1.3}
-  .who .name b{display:block;font-size:13px}
-  .who .role{font-size:10.5px;color:var(--gold-soft)}
-  .icon-btn{
-    width:34px;height:34px;border-radius:10px;border:none;
-    background:rgba(255,255,255,.12);color:#fff;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
+  #app.show {
+    display: flex
   }
 
-  nav.tabs{
-    display:flex;gap:6px;margin-top:14px;overflow-x:auto;padding-bottom:2px;
-    scrollbar-width:none;
+  header.topbar {
+    background: linear-gradient(155deg, var(--teal-mid), var(--teal-deep));
+    color: #fff;
+    padding: 16px 18px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 6px 18px -10px rgba(0, 0, 0, .4);
   }
-  nav.tabs::-webkit-scrollbar{display:none}
-  nav.tabs button{
-    flex:none;border:none;cursor:pointer;
-    background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
-    font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;
-    transition:background .15s,color .15s;
-    white-space:nowrap;
+  .topbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px
   }
-  nav.tabs button.active{background:var(--gold);color:var(--teal-deep)}
+  .topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px
+  }
+  .topbar-title .mark {
+    width: 26px;
+    height: 26px
+  }
+  .topbar-title .mark path {
+    fill: var(--gold-soft)
+  }
+  .topbar-title h1 {
+    font-size: 15.5px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.3
+  }
+  .topbar-title span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gold-soft);
+    opacity: .9
+  }
+  .who {
+    display: flex;
+    align-items: center;
+    gap: 8px
+  }
+  .who .name {
+    font-size: 12.5px;
+    text-align: left;
+    line-height: 1.3
+  }
+  .who .name b {
+    display: block;
+    font-size: 13px
+  }
+  .who .role {
+    font-size: 10.5px;
+    color: var(--gold-soft)
+  }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  main{flex:1;padding:16px 14px 90px;max-width:720px;width:100%;margin:0 auto}
-  .section{display:none}
-  .section.active{display:block}
+  nav.tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  nav.tabs::-webkit-scrollbar {
+    display: none
+  }
+  nav.tabs button {
+    flex: none;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, .08);
+    color: rgba(255, 255, 255, .85);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 999px;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  nav.tabs button.active {
+    background: var(--gold);
+    color: var(--teal-deep)
+  }
 
-  .toolbar{display:flex;gap:8px;margin-bottom:14px}
-  .search-box{
-    flex:1;position:relative;
+  main {
+    flex: 1;
+    padding: 16px 14px 90px;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto
   }
-  .search-box input{
-    width:100%;padding:11px 14px 11px 14px;border-radius:12px;
-    border:1.5px solid var(--line);background:var(--paper);font-size:14.5px;
+  .section {
+    display: none
   }
-  .search-box input:focus{outline:none;border-color:var(--gold)}
+  .section.active {
+    display: block
+  }
 
-  .empty{
-    text-align:center;padding:50px 20px;color:var(--ink-soft);
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px
   }
-  .empty .mark{width:40px;height:40px;margin:0 auto 12px;opacity:.5}
-  .empty .mark path{fill:var(--teal-mid)}
-  .empty p{font-size:13.5px;margin:4px 0}
+  .search-box {
+    flex: 1;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 11px 14px 11px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    font-size: 14.5px;
+  }
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--gold)
+  }
 
-  .card{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:16px;margin-bottom:12px;
-    box-shadow:var(--shadow);
+  .empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--ink-soft);
   }
-  .card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
-  .card-head h3{margin:0;font-size:15.5px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .avatar{
-    width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none;
-    border:1.5px solid var(--line);background:#fff;
+  .empty .mark {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 12px;
+    opacity: .5
   }
-  .avatar-empty{
-    display:flex;align-items:center;justify-content:center;
-    color:var(--teal-deep);font-weight:800;font-size:15px;background:var(--gold-soft);
+  .empty .mark path {
+    fill: var(--teal-mid)
   }
-  .code-pill{
-    font-size:11px;font-weight:700;color:var(--teal-deep);
-    background:var(--gold-soft);padding:3px 9px;border-radius:999px;
-    white-space:nowrap;
+  .empty p {
+    font-size: 13.5px;
+    margin: 4px 0
   }
-  .meta-row{
-    display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:12px;
-    font-size:12.5px;color:var(--ink-soft);
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
   }
-  .meta-row b{color:var(--ink);font-weight:600}
-  .divider{height:1px;background:var(--line);margin:10px 0}
-  .checklist-mini{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-  .chip{
-    font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:999px;
-    background:#EFEAD9;color:var(--ink-soft);
-    display:flex;align-items:center;gap:5px;
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px
   }
-  .chip.on{background:rgba(47,110,79,.12);color:var(--ok)}
-  .chip.on::before{content:"✓";font-weight:800}
-  .card-actions{display:flex;gap:8px}
+  .card-head h3 {
+    margin: 0;
+    font-size: 15.5px;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: none;
+    border: 1.5px solid var(--line);
+    background: #fff;
+  }
+  .avatar-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--teal-deep);
+    font-weight: 800;
+    font-size: 15px;
+    background: var(--gold-soft);
+  }
+  .code-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal-deep);
+    background: var(--gold-soft);
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .meta-row b {
+    color: var(--ink);
+    font-weight: 600
+  }
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 10px 0
+  }
+  .checklist-mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px
+  }
+  .chip {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #EFEAD9;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip.on {
+    background: rgba(47, 110, 79, .12);
+    color: var(--ok)
+  }
+  .chip.on::before {
+    content: "✓";
+    font-weight: 800
+  }
+  .card-actions {
+    display: flex;
+    gap: 8px
+  }
 
   /* ---------- form (add/edit) ---------- */
-  .form-card{
-    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-    padding:18px;box-shadow:var(--shadow);
+  .form-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
   }
-  .form-card h2{font-size:16px;margin:0 0 4px;font-weight:800}
-  .form-card p.hint{margin:0 0 18px;color:var(--ink-soft);font-size:12.5px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .room-input{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:11px;background:#fff;overflow:hidden;transition:border-color .15s, box-shadow .15s}
-  .room-input:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,161,91,.18)}
-  .room-prefix{padding:12px 14px;font-size:15px;color:var(--ink-soft);font-weight:600;background:var(--cream);border-left:1.5px solid var(--line);white-space:nowrap}
-  .room-input input{border:none !important;box-shadow:none !important;padding:12px 14px;flex:1;min-width:0}
-  .room-input input:focus{box-shadow:none !important}
-  @media (max-width:420px){.grid2{grid-template-columns:1fr}}
+  .form-card h2 {
+    font-size: 16px;
+    margin: 0 0 4px;
+    font-weight: 800
+  }
+  .form-card p.hint {
+    margin: 0 0 18px;
+    color: var(--ink-soft);
+    font-size: 12.5px
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px
+  }
+  .room-input {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--line);
+    border-radius: 11px;
+    background: #fff;
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .room-input:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201, 161, 91, .18);
+  }
+  .room-prefix {
+    padding: 12px 14px;
+    font-size: 15px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    background: var(--cream);
+    border-left: 1.5px solid var(--line);
+    white-space: nowrap;
+  }
+  .room-input input {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 12px 14px;
+    flex: 1;
+    min-width: 0;
+  }
+  .room-input input:focus {
+    box-shadow: none !important
+  }
+  .room-suffix {
+    border-left: none;
+    border-right: 1.5px solid var(--line);
+  }
+  @media (max-width:420px) {
+    .grid2 {
+      grid-template-columns: 1fr
+    }
+  }
 
-  .items-legend{
-    font-size:12.5px;font-weight:700;color:var(--teal-deep);
-    margin:20px 0 8px;display:flex;align-items:center;gap:6px;
+  .items-legend {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--teal-deep);
+    margin: 20px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .items-legend .rule{flex:1;height:1px;background:var(--line)}
+  .items-legend .rule {
+    flex: 1;
+    height: 1px;
+    background: var(--line)
+  }
 
-  .photo-field{margin-bottom:4px}
-  .photo-drop{
-    position:relative;border:2px dashed var(--line);border-radius:14px;
-    min-height:120px;display:flex;align-items:center;justify-content:center;
-    background:#FFFEFA;cursor:pointer;transition:border-color .15s,background .15s;
-    overflow:hidden;
+  .photo-field {
+    margin-bottom: 4px
   }
-  .photo-drop:hover, .photo-drop.dragover{border-color:var(--gold, #C9A15B);background:#FBF6EA}
-  .photo-drop-text{
-    display:flex;flex-direction:column;align-items:center;gap:6px;
-    color:var(--ink-soft);font-size:12px;padding:16px;text-align:center;
+  .photo-drop {
+    position: relative;
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFEFA;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    overflow: hidden;
   }
-  .photo-drop img{width:100%;height:150px;object-fit:cover;display:block}
-  .photo-remove{
-    position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:50%;
-    border:none;background:rgba(0,0,0,.55);color:#fff;font-size:13px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;line-height:1;
+  .photo-drop:hover,
+  .photo-drop.dragover {
+    border-color: var(--gold, #C9A15B);
+    background: #FBF6EA
   }
-  .item-row{
-    display:flex;align-items:center;gap:12px;
-    padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;
-    margin-bottom:8px;background:#FFFEFA;
+  .photo-drop-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    padding: 16px;
+    text-align: center;
   }
-  .item-row.checked{border-color:var(--gold);background:rgba(228,201,138,.14)}
-  .checkbox{
-    width:22px;height:22px;border-radius:7px;border:2px solid var(--line);
-    flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
-    transition:all .12s;
+  .photo-drop img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block
   }
-  .checkbox.checked{background:var(--gold);border-color:var(--gold)}
-  .checkbox svg{width:13px;height:13px;display:none}
-  .checkbox.checked svg{display:block}
-  .item-icon{width:20px;height:20px;flex:none;opacity:.75}
-  .item-icon path,.item-icon circle,.item-icon rect{stroke:var(--teal-deep)}
-  .item-name{flex:1;font-size:14px;font-weight:600}
-  .stepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
-  .stepper button{
-    width:30px;height:30px;border:none;background:#EFEAD9;color:var(--teal-deep);
-    font-size:16px;font-weight:700;cursor:pointer;
+  .photo-remove {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, .55);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
-  .stepper input{
-    width:38px;text-align:center;border:none;background:#fff;font-size:14px;font-weight:700;
-    padding:0;height:30px;
+  .item-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    background: #FFFEFA;
   }
-  .stepper input:focus{outline:none}
-  .item-row:not(.checked) .stepper{opacity:.35;pointer-events:none}
+  .item-row.checked {
+    border-color: var(--gold);
+    background: rgba(228, 201, 138, .14)
+  }
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--line);
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .checkbox.checked {
+    background: var(--gold);
+    border-color: var(--gold)
+  }
+  .checkbox svg {
+    width: 13px;
+    height: 13px;
+    display: none
+  }
+  .checkbox.checked svg {
+    display: block
+  }
+  .item-icon {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    opacity: .75
+  }
+  .item-icon path,
+  .item-icon circle,
+  .item-icon rect {
+    stroke: var(--teal-deep)
+  }
+  .item-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden
+  }
+  .stepper button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #EFEAD9;
+    color: var(--teal-deep);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .stepper input {
+    width: 38px;
+    text-align: center;
+    border: none;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0;
+    height: 30px;
+  }
+  .stepper input:focus {
+    outline: none
+  }
+  .item-row:not(.checked) .stepper {
+    opacity: .35;
+    pointer-events: none
+  }
 
-  .form-actions{display:flex;gap:10px;margin-top:22px}
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px
+  }
 
   /* ---------- admins section ---------- */
-  .admin-row{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px 14px;border:1px solid var(--line);border-radius:12px;
-    background:var(--paper);margin-bottom:8px;box-shadow:var(--shadow);
+  .admin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper);
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
   }
-  .admin-row .info{display:flex;flex-direction:column;gap:2px}
-  .admin-row .info b{font-size:14px}
-  .admin-row .info span{font-size:11.5px;color:var(--ink-soft)}
-  .super-tag{
-    font-size:10px;font-weight:800;background:var(--teal-deep);color:var(--gold-soft);
-    padding:2px 8px;border-radius:999px;margin-inline-start:6px;
+  .admin-row .info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px
+  }
+  .admin-row .info b {
+    font-size: 14px
+  }
+  .admin-row .info span {
+    font-size: 11.5px;
+    color: var(--ink-soft)
+  }
+  .super-tag {
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--teal-deep);
+    color: var(--gold-soft);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-inline-start: 6px;
   }
 
-  .lock-note{
-    display:flex;gap:10px;align-items:flex-start;background:#EFEAD9;
-    border-radius:12px;padding:12px 14px;color:var(--ink-soft);font-size:12.5px;
-    margin-bottom:16px;
+  .lock-note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #EFEAD9;
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    margin-bottom: 16px;
   }
 
   /* ---------- modal ---------- */
-  .modal-bg{
-    position:fixed;inset:0;background:rgba(15,30,30,.55);
-    display:none;align-items:flex-end;justify-content:center;z-index:50;
-    backdrop-filter:blur(2px);
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 30, 30, .55);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(2px);
   }
-  .modal-bg.show{display:flex}
-  .modal{
-    background:var(--paper);width:100%;max-width:420px;
-    border-radius:20px 20px 0 0;padding:22px 20px 26px;
-    animation:slideup .18s ease;
-    max-height:88vh;overflow-y:auto;
+  .modal-bg.show {
+    display: flex
   }
-  @media (min-width:520px){
-    .modal-bg{align-items:center}
-    .modal{border-radius:20px}
+  .modal {
+    background: var(--paper);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 20px 26px;
+    animation: slideup .18s ease;
+    max-height: 88vh;
+    overflow-y: auto;
   }
-  @keyframes slideup{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-  .modal h3{margin:0 0 6px;font-size:16px}
-  .modal p{margin:0 0 20px;font-size:13.5px;color:var(--ink-soft)}
-  .modal-actions{display:flex;gap:10px}
+  @media (min-width:520px) {
+    .modal-bg {
+      align-items: center
+    }
+    .modal {
+      border-radius: 20px
+    }
+  }
+  @keyframes slideup {
+    from {
+      transform: translateY(30px);
+      opacity: 0
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1
+    }
+  }
+  .modal h3 {
+    margin: 0 0 6px;
+    font-size: 16px
+  }
+  .modal p {
+    margin: 0 0 20px;
+    font-size: 13.5px;
+    color: var(--ink-soft)
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px
+  }
 
-  .toast{
-    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-    background:var(--teal-deep);color:#fff;padding:12px 20px;border-radius:999px;
-    font-size:13.5px;font-weight:600;box-shadow:0 12px 24px -8px rgba(0,0,0,.4);
-    z-index:100;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--teal-deep);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, .4);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
   }
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
-  .toast.err{background:var(--danger)}
-
-  .skeleton{
-    height:96px;border-radius:16px;margin-bottom:12px;
-    background:linear-gradient(90deg,#EFEAD9 25%,#F7F3EA 37%,#EFEAD9 63%);
-    background-size:400% 100%;animation:shimmer 1.4s infinite;
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px)
   }
-  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+  .toast.err {
+    background: var(--danger)
+  }
 
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none !important;transition:none !important}
+  .skeleton {
+    height: 96px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, #EFEAD9 25%, #F7F3EA 37%, #EFEAD9 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 100% 0
+    }
+    100% {
+      background-position: 0 0
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important
+    }
   }
 </style>
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
-<div class="login-wrap" id="loginScreen">
-  <div class="login-card">
-    <div class="login-badge">
-      <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z" fill-rule="evenodd" fill-opacity="1"/></svg>
-    </div>
-    <h1 class="brand">خوابگاه مدرسه آیت‌الله خویی</h1>
-    <p class="sub">سامانه مدیریت ساکنان خوابگاه</p>
+  <!-- ================= LOGIN ================= -->
+  <div class="login-wrap" id="loginScreen">
+    <div class="login-card">
+      <div class="login-badge">
+        <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z" fill-rule="evenodd" fill-opacity="1"/></svg>
+      </div>
+      <h1 class="brand">خوابگاه مدرسه آیت‌الله خویی</h1>
+      <p class="sub">سامانه مدیریت ساکنان خوابگاه</p>
 
-    <div class="msg error" id="loginMsg"></div>
+      <div class="msg error" id="loginMsg"></div>
 
-    <div class="field">
-      <label>نام کاربری</label>
-      <input id="loginUser" type="text" autocomplete="username" placeholder="نام کاربری خود را وارد کنید">
+      <div class="field">
+        <label>نام کاربری</label>
+        <input id="loginUser" type="text" autocomplete="username" placeholder="نام کاربری خود را وارد کنید">
+      </div>
+      <div class="field">
+        <label>رمز عبور</label>
+        <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary" id="loginBtn">ورود به سامانه</button>
     </div>
-    <div class="field">
-      <label>رمز عبور</label>
-      <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" id="loginBtn">ورود به سامانه</button>
   </div>
-</div>
 
-<!-- ================= APP ================= -->
-<div id="app">
-  <header class="topbar">
-    <div class="topbar-row">
-      <div class="topbar-title">
-        <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z"/></svg>
-        <div>
-          <h1>خوابگاه آیت‌الله خویی</h1>
-          <span>سامانه مدیریت ساکنان</span>
+  <!-- ================= APP ================= -->
+  <div id="app">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="topbar-title">
+          <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z"/></svg>
+          <div>
+            <h1>خوابگاه آیت‌الله خویی</h1>
+            <span>سامانه مدیریت ساکنان</span>
+          </div>
+        </div>
+        <div class="who">
+          <div class="name"><b id="whoName">—</b><span class="role" id="whoRole">—</span></div>
+          <button class="icon-btn" id="myProfileBtn" title="ویرایش حساب من">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+          </button>
+          <button class="icon-btn" id="logoutBtn" title="خروج">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          </button>
         </div>
       </div>
-      <div class="who">
-        <div class="name"><b id="whoName">—</b><span class="role" id="whoRole">—</span></div>
-        <button class="icon-btn" id="myProfileBtn" title="ویرایش حساب من">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
-        </button>
-        <button class="icon-btn" id="logoutBtn" title="خروج">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-        </button>
-      </div>
-    </div>
-    <nav class="tabs" id="tabs">
-      <button data-tab="list" class="active">فهرست ساکنان</button>
-      <button data-tab="add">افزودن فرد جدید</button>
-      <button data-tab="admins" id="tabAdmins" style="display:none">مدیریت ادمین‌ها</button>
-    </nav>
-  </header>
+      <nav class="tabs" id="tabs">
+        <button data-tab="list" class="active">فهرست ساکنان</button>
+        <button data-tab="add">افزودن فرد جدید</button>
+        <button data-tab="admins" id="tabAdmins" style="display:none">مدیریت ادمین‌ها</button>
+      </nav>
+    </header>
 
-  <main>
-    <!-- ---- LIST ---- -->
-    <section class="section active" id="sec-list">
-      <div class="toolbar">
-        <div class="search-box">
-          <input id="searchInput" type="text" placeholder="جستجو بر اساس نام، کد شهریه، گروه، شماره اتاق...">
+    <main>
+      <!-- ---- LIST ---- -->
+      <section class="section active" id="sec-list">
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="searchInput" type="text" placeholder="جستجو بر اساس نام، کد شهریه، گروه، شماره اتاق...">
+          </div>
+          <button class="btn btn-gold btn-sm icon-only" id="refreshBtn" title="بازخوانی" aria-label="بازخوانی">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
         </div>
-        <button class="btn btn-gold btn-sm icon-only" id="refreshBtn" title="بازخوانی" aria-label="بازخوانی">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        </button>
-      </div>
-      <div class="toolbar" style="margin-bottom:14px">
-        <button class="btn btn-ghost btn-sm" style="flex:1" id="exportExcelBtn">📊 خروجی اکسل</button>
-        <button class="btn btn-ghost btn-sm" style="flex:1" id="exportWordBtn">📄 خروجی ورد</button>
-        <button class="btn btn-ghost btn-sm" style="flex:1" id="exportPdfBtn">🧾 خروجی PDF</button>
-      </div>
-      <div id="listWrap"></div>
-    </section>
+        <div class="toolbar" style="margin-bottom:14px">
+          <button class="btn btn-ghost btn-sm" style="flex:1" id="exportExcelBtn">📊 خروجی اکسل</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" id="exportWordBtn">📄 خروجی ورد</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" id="exportPdfBtn">🧾 خروجی PDF</button>
+        </div>
+        <div id="listWrap"></div>
+      </section>
 
-    <!-- ---- ADD / EDIT ---- -->
-    <section class="section" id="sec-add">
-      <div class="form-card">
-        <h2 id="formTitle">افزودن فرد جدید</h2>
-        <p class="hint">اطلاعات فرد و لوازم تحویلی را وارد کنید.</p>
+      <!-- ---- ADD / EDIT ---- -->
+      <section class="section" id="sec-add">
+        <div class="form-card">
+          <h2 id="formTitle">افزودن فرد جدید</h2>
+          <p class="hint">اطلاعات فرد و لوازم تحویلی را وارد کنید.</p>
 
-        <div class="items-legend"><span>عکس فرد</span><span class="rule"></span></div>
-        <div class="photo-field">
-          <div id="photoDrop" class="photo-drop">
-            <img id="photoPreview" style="display:none">
-            <div id="photoDropText" class="photo-drop-text">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>عکس را بکشید و رها کنید یا کلیک کنید</span>
-              <span style="opacity:.7;font-size:10.5px">فرمت‌های مجاز: PNG, WEBP, JPG, JPEG</span>
+          <div class="items-legend"><span>عکس فرد</span><span class="rule"></span></div>
+          <div class="photo-field">
+            <div id="photoDrop" class="photo-drop">
+              <img id="photoPreview" style="display:none">
+              <div id="photoDropText" class="photo-drop-text">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>عکس را بکشید و رها کنید یا کلیک کنید</span>
+                <span style="opacity:.7;font-size:10.5px">فرمت‌های مجاز: PNG, WEBP, JPG, JPEG</span>
+              </div>
+              <button type="button" id="photoRemoveBtn" class="photo-remove" style="display:none" title="حذف عکس">✕</button>
             </div>
-            <button type="button" id="photoRemoveBtn" class="photo-remove" style="display:none" title="حذف عکس">✕</button>
-          </div>
-          <input type="file" id="photoFileInput" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" style="display:none">
-          <div class="field" style="margin-top:8px">
-            <label>یا لینک عکس را وارد کنید</label>
-            <input id="f_photo_url" type="text" placeholder="https://example.com/photo.jpg" dir="ltr" style="text-align:right">
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div class="field">
-            <label>نام و نام خانوادگی *</label>
-            <input id="f_full_name" type="text" placeholder="مثال: علی محمدی">
-          </div>
-          <div class="field">
-            <label>کد شهریه *</label>
-            <input id="f_tuition_code" type="text" placeholder="مثال: 40125">
-          </div>
-          <div class="field">
-            <label>شماره موبایل</label>
-            <input id="f_phone" type="tel" placeholder="09xxxxxxxxx" dir="ltr" style="text-align:right">
-          </div>
-          <div class="field">
-            <label>گروه</label>
-            <select id="f_group_name">
-              <option value="">— انتخاب کنید —</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>شماره سالن</label>
-            <select id="f_hall_number">
-              <option value="">— انتخاب کنید —</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>شماره اتاق</label>
-            <div class="room-input">
-              <span class="room-prefix">اتاق</span>
-              <input id="f_room_number" type="text" inputmode="numeric" placeholder="مثال: ۵">
+            <input type="file" id="photoFileInput" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" style="display:none">
+            <div class="field" style="margin-top:8px">
+              <label>یا لینک عکس را وارد کنید</label>
+              <input id="f_photo_url" type="text" placeholder="https://example.com/photo.jpg" dir="ltr" style="text-align:right">
             </div>
           </div>
-          <div class="field">
-            <label>شماره انگشتی</label>
-            <input id="f_fingerprint_number" type="text" inputmode="numeric" placeholder="مثال: 123">
+
+          <div class="grid2">
+            <div class="field">
+              <label>نام و نام خانوادگی *</label>
+              <input id="f_full_name" type="text" placeholder="مثال: علی محمدی">
+            </div>
+            <div class="field">
+              <label>کد شهریه *</label>
+              <input id="f_tuition_code" type="text" placeholder="مثال: 40125">
+            </div>
+            <div class="field">
+              <label>شماره موبایل</label>
+              <input id="f_phone" type="tel" placeholder="09xxxxxxxxx" dir="ltr" style="text-align:right">
+            </div>
+            <div class="field">
+              <label>گروه</label>
+              <select id="f_group_name">
+                <option value="">— انتخاب کنید —</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>شماره سالن</label>
+              <div class="room-input">
+                <span class="room-prefix">سالن</span>
+                <input id="f_hall_number" type="text" inputmode="numeric" placeholder="مثال: ۱">
+                <span class="room-prefix room-suffix">شرقی</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>شماره اتاق</label>
+              <div class="room-input">
+                <span class="room-prefix">اتاق</span>
+                <input id="f_room_number" type="text" inputmode="numeric" placeholder="مثال: ۵">
+              </div>
+            </div>
+            <div class="field">
+              <label>شماره انگشتی</label>
+              <input id="f_fingerprint_number" type="text" inputmode="numeric" placeholder="مثال: 123">
+            </div>
+          </div>
+
+          <div class="items-legend"><span>لوازم تحویلی</span><span class="rule"></span></div>
+          <div id="itemsWrap"></div>
+
+          <div class="msg error" id="formMsg"></div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary btn-block" id="saveBtn">ثبت اطلاعات</button>
+            <button class="btn btn-ghost" id="cancelEditBtn" style="display:none">انصراف</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- ADMINS ---- -->
+      <section class="section" id="sec-admins">
+        <div class="lock-note">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:1px"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>این بخش فقط برای سوپر ادمین قابل مشاهده است. ادمین‌های جدید می‌توانند ساکنان را مدیریت کنند اما به این بخش دسترسی ندارند.</span>
+        </div>
+
+        <div class="form-card" style="margin-bottom:16px">
+          <h2 id="adminFormTitle">افزودن ادمین جدید</h2>
+          <p class="hint" id="adminFormHint">یک حساب کاربری برای همکار جدید بساز.</p>
+          <div class="grid2">
+            <div class="field">
+              <label>نام و نام خانوادگی</label>
+              <input id="a_full_name" type="text" placeholder="نام همکار">
+            </div>
+            <div class="field">
+              <label>نام کاربری</label>
+              <input id="a_username" type="text" placeholder="حداقل ۳ کاراکتر" dir="ltr" style="text-align:right">
+            </div>
+            <div class="field">
+              <label id="a_password_label">رمز عبور</label>
+              <input id="a_password" type="text" placeholder="حداقل ۴ کاراکتر" dir="ltr" style="text-align:right">
+            </div>
+            <div class="field">
+              <label>سطح دسترسی</label>
+              <select id="a_is_super">
+                <option value="false">ادمین عادی</option>
+                <option value="true">سوپر ادمین</option>
+              </select>
+            </div>
+          </div>
+          <div class="msg error" id="adminMsg"></div>
+          <div class="form-actions" style="margin-top:14px">
+            <button class="btn btn-primary btn-block" id="addAdminBtn">افزودن ادمین</button>
+            <button class="btn btn-ghost" id="cancelEditAdminBtn" style="display:none">انصراف</button>
           </div>
         </div>
 
-        <div class="items-legend"><span>لوازم تحویلی</span><span class="rule"></span></div>
-        <div id="itemsWrap"></div>
+        <div id="adminsListWrap"></div>
+      </section>
+    </main>
+  </div>
 
-        <div class="msg error" id="formMsg"></div>
-
-        <div class="form-actions">
-          <button class="btn btn-primary btn-block" id="saveBtn">ثبت اطلاعات</button>
-          <button class="btn btn-ghost" id="cancelEditBtn" style="display:none">انصراف</button>
-        </div>
+  <!-- confirm delete modal -->
+  <div class="modal-bg" id="confirmModal">
+    <div class="modal">
+      <h3 id="confirmTitle">حذف مورد</h3>
+      <p id="confirmText">این عمل غیرقابل بازگشت است. مطمئن هستید؟</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger btn-block" id="confirmYes">بله، حذف کن</button>
+        <button class="btn btn-ghost btn-block" id="confirmNo">انصراف</button>
       </div>
-    </section>
-
-    <!-- ---- ADMINS ---- -->
-    <section class="section" id="sec-admins">
-      <div class="lock-note">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-top:1px"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>این بخش فقط برای سوپر ادمین قابل مشاهده است. ادمین‌های جدید می‌توانند ساکنان را مدیریت کنند اما به این بخش دسترسی ندارند.</span>
-      </div>
-
-      <div class="form-card" style="margin-bottom:16px">
-        <h2 id="adminFormTitle">افزودن ادمین جدید</h2>
-        <p class="hint" id="adminFormHint">یک حساب کاربری برای همکار جدید بساز.</p>
-        <div class="grid2">
-          <div class="field">
-            <label>نام و نام خانوادگی</label>
-            <input id="a_full_name" type="text" placeholder="نام همکار">
-          </div>
-          <div class="field">
-            <label>نام کاربری</label>
-            <input id="a_username" type="text" placeholder="حداقل ۳ کاراکتر" dir="ltr" style="text-align:right">
-          </div>
-          <div class="field">
-            <label id="a_password_label">رمز عبور</label>
-            <input id="a_password" type="text" placeholder="حداقل ۴ کاراکتر" dir="ltr" style="text-align:right">
-          </div>
-          <div class="field">
-            <label>سطح دسترسی</label>
-            <select id="a_is_super">
-              <option value="false">ادمین عادی</option>
-              <option value="true">سوپر ادمین</option>
-            </select>
-          </div>
-        </div>
-        <div class="msg error" id="adminMsg"></div>
-        <div class="form-actions" style="margin-top:14px">
-          <button class="btn btn-primary btn-block" id="addAdminBtn">افزودن ادمین</button>
-          <button class="btn btn-ghost" id="cancelEditAdminBtn" style="display:none">انصراف</button>
-        </div>
-      </div>
-
-      <div id="adminsListWrap"></div>
-    </section>
-  </main>
-</div>
-
-<!-- confirm delete modal -->
-<div class="modal-bg" id="confirmModal">
-  <div class="modal">
-    <h3 id="confirmTitle">حذف مورد</h3>
-    <p id="confirmText">این عمل غیرقابل بازگشت است. مطمئن هستید؟</p>
-    <div class="modal-actions">
-      <button class="btn btn-danger btn-block" id="confirmYes">بله، حذف کن</button>
-      <button class="btn btn-ghost btn-block" id="confirmNo">انصراف</button>
     </div>
   </div>
-</div>
 
-<!-- profile edit modal -->
-<div class="modal-bg" id="profileModal">
-  <div class="modal">
-    <h3>ویرایش حساب من</h3>
-    <p>برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذارید.</p>
-    <div class="field">
-      <label>نام و نام خانوادگی</label>
-      <input id="p_full_name" type="text">
-    </div>
-    <div class="field">
-      <label>نام کاربری</label>
-      <input id="p_username" type="text" dir="ltr" style="text-align:right">
-    </div>
-    <div class="field">
-      <label>رمز عبور جدید</label>
-      <input id="p_password" type="text" placeholder="خالی = بدون تغییر" dir="ltr" style="text-align:right">
-    </div>
-    <div class="msg error" id="profileMsg"></div>
-    <div class="modal-actions">
-      <button class="btn btn-primary btn-block" id="profileSaveBtn">ذخیره تغییرات</button>
-      <button class="btn btn-ghost btn-block" id="profileCancelBtn">انصراف</button>
+  <!-- profile edit modal -->
+  <div class="modal-bg" id="profileModal">
+    <div class="modal">
+      <h3>ویرایش حساب من</h3>
+      <p>برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذارید.</p>
+      <div class="field">
+        <label>نام و نام خانوادگی</label>
+        <input id="p_full_name" type="text">
+      </div>
+      <div class="field">
+        <label>نام کاربری</label>
+        <input id="p_username" type="text" dir="ltr" style="text-align:right">
+      </div>
+      <div class="field">
+        <label>رمز عبور جدید</label>
+        <input id="p_password" type="text" placeholder="خالی = بدون تغییر" dir="ltr" style="text-align:right">
+      </div>
+      <div class="msg error" id="profileMsg"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-block" id="profileSaveBtn">ذخیره تغییرات</button>
+        <button class="btn btn-ghost btn-block" id="profileCancelBtn">انصراف</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <div class="toast" id="toast"></div>
 
-<script>
-/* ========================= تنظیمات Supabase ========================= */
-const SUPABASE_URL = "https://cjgxkvbrzoeotenvkvxx.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqZ3hrdmJyem9lb3RlbnZrdnh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDYyNjgsImV4cCI6MjEwMzEyMjI2OH0.v0t-yGXsCfPacna6BIHlpoiadDAO80Ns1vP6Yzvkdjg";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    /* ========================= تنظیمات Supabase ========================= */
+    const SUPABASE_URL = "https://cjgxkvbrzoeotenvkvxx.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqZ3hrdmJyem9lb3RlbnZrdnh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDYyNjgsImV4cCI6MjEwMzEyMjI2OH0.v0t-yGXsCfPacna6BIHlpoiadDAO80Ns1vP6Yzvkdjg";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ========================= حالت (state) ========================= */
-let session = JSON.parse(localStorage.getItem("dorm_session") || "null"); // {token, admin}
-let students = [];
-let editingId = null;
-let confirmAction = null;
+    /* ========================= حالت (state) ========================= */
+    let session = JSON.parse(localStorage.getItem("dorm_session") || "null"); // {token, admin}
+    let students = [];
+    let editingId = null;
+    let confirmAction = null;
 
-const GROUPS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "خارج"];
-const HALLS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "ادبیات استاد ابوالفضلی", "خارج ثامن"];
+    const GROUPS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "خارج", "ادبیات استاد ابوالفضلی"];
 
-const ITEMS = [
-  { key:"spoon",   label:"قاشق", icon:'<path d="M12 2c-2 0-3.5 2-3.5 4.5S10 12 12 12s3.5-3 3.5-5.5S14 2 12 2z"/><path d="M12 12v10"/>' },
-  { key:"blanket", label:"پتو",  icon:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 12h18M9 6v12"/>' },
-  { key:"pillow",  label:"بالش", icon:'<rect x="3" y="7" width="18" height="10" rx="5"/>' },
-  { key:"dish",    label:"دیس",  icon:'<ellipse cx="12" cy="12" rx="9" ry="4.5"/><ellipse cx="12" cy="12" rx="4.3" ry="2.1"/>' },
-  { key:"bowl",    label:"کاسه", icon:'<path d="M3 11a9 6 0 0 0 18 0"/><path d="M3 11h18"/>' },
-];
+    const ITEMS = [
+      { key: "spoon", label: "قاشق", icon: '<path d="M12 2c-2 0-3.5 2-3.5 4.5S10 12 12 12s3.5-3 3.5-5.5S14 2 12 2z"/><path d="M12 12v10"/>' },
+      { key: "blanket", label: "پتو", icon: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 12h18M9 6v12"/>' },
+      { key: "pillow", label: "بالش", icon: '<rect x="3" y="7" width="18" height="10" rx="5"/>' },
+      { key: "dish", label: "دیس", icon: '<ellipse cx="12" cy="12" rx="9" ry="4.5"/><ellipse cx="12" cy="12" rx="4.3" ry="2.1"/>' },
+      { key: "bowl", label: "کاسه", icon: '<path d="M3 11a9 6 0 0 0 18 0"/><path d="M3 11h18"/>' },
+    ];
 
-/* ========================= ابزار ========================= */
-function normalizeDigits(str){
-  if(!str) return str;
-  const fa = "۰۱۲۳۴۵۶۷۸۹", ar = "٠١٢٣٤٥٦٧٨٩";
-  return String(str).replace(/[۰-۹٠-٩]/g, ch=>{
-    let i = fa.indexOf(ch);
-    if(i > -1) return i;
-    i = ar.indexOf(ch);
-    if(i > -1) return i;
-    return ch;
-  });
-}
-function toast(msg, isErr=false){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast show" + (isErr ? " err" : "");
-  clearTimeout(t._timer);
-  t._timer = setTimeout(()=> t.className="toast", 2500);
-}
-function showMsg(id, text){
-  const el = document.getElementById(id);
-  if(!text){ el.className = "msg error"; el.textContent=""; return; }
-  el.textContent = text;
-  el.className = "msg error show";
-}
-function esc(s){
-  return (s ?? "").toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-async function callRpc(name, params, timeoutMs = 20000){
-  const timeout = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error("درخواست بیش از حد طول کشید. اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.")), timeoutMs);
-  });
-  const { data, error } = await Promise.race([sb.rpc(name, params), timeout]);
-  if(error) throw new Error(error.message || "خطایی رخ داد.");
-  return data;
-}
-function saveSession(s){
-  session = s;
-  localStorage.setItem("dorm_session", JSON.stringify(s));
-}
-function clearSession(){
-  session = null;
-  localStorage.removeItem("dorm_session");
-}
-
-/* ========================= ورود ========================= */
-document.getElementById("loginBtn").addEventListener("click", doLogin);
-document.getElementById("loginPass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
-document.getElementById("loginUser").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
-
-async function doLogin(){
-  const username = document.getElementById("loginUser").value.trim();
-  const password = document.getElementById("loginPass").value;
-  showMsg("loginMsg", "");
-  if(!username || !password){ showMsg("loginMsg","نام کاربری و رمز عبور را وارد کنید."); return; }
-  const btn = document.getElementById("loginBtn");
-  btn.disabled = true; btn.textContent = "در حال ورود...";
-  try{
-    const data = await callRpc("rpc_login", { p_username: username, p_password: password });
-    saveSession(data);
-    enterApp();
-  }catch(err){
-    showMsg("loginMsg", err.message);
-  }finally{
-    btn.disabled = false; btn.textContent = "ورود به سامانه";
-  }
-}
-
-document.getElementById("logoutBtn").addEventListener("click", async ()=>{
-  try{ if(session) await callRpc("rpc_logout", { p_token: session.token }); }catch(e){}
-  clearSession();
-  location.reload();
-});
-
-/* ========================= ورود به اپ ========================= */
-function enterApp(){
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("app").className = "show";
-  document.getElementById("whoName").textContent = session.admin.full_name;
-  document.getElementById("whoRole").textContent = session.admin.is_super ? "سوپر ادمین" : "ادمین";
-  document.getElementById("tabAdmins").style.display = session.admin.is_super ? "inline-block" : "none";
-  buildGroupOptions();
-  buildHallOptions();
-  buildItemsForm();
-  loadStudents();
-}
-
-async function checkSession(){
-  if(!session) return;
-  try{
-    await callRpc("rpc_whoami", { p_token: session.token });
-    enterApp();
-  }catch(e){
-    clearSession();
-  }
-}
-checkSession();
-
-/* ========================= تب‌ها ========================= */
-document.getElementById("tabs").addEventListener("click", e=>{
-  const btn = e.target.closest("button[data-tab]");
-  if(!btn) return;
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.getElementById("sec-"+btn.dataset.tab).classList.add("active");
-  if(btn.dataset.tab === "add" && !editingId) resetForm();
-  if(btn.dataset.tab === "admins"){ if(!editingAdminId) resetAdminForm(); loadAdmins(); }
-});
-function goTab(tab){
-  document.querySelector(`#tabs button[data-tab="${tab}"]`).click();
-}
-
-/* ========================= فهرست ساکنان ========================= */
-async function loadStudents(search=""){
-  const wrap = document.getElementById("listWrap");
-  wrap.innerHTML = `<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>`;
-  try{
-    students = await callRpc("rpc_list_students", { p_token: session.token, p_search: search || null });
-    renderStudents();
-  }catch(err){
-    wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
-  }
-}
-
-document.getElementById("refreshBtn").addEventListener("click", ()=> loadStudents(normalizeDigits(document.getElementById("searchInput").value)));
-let searchTimer;
-document.getElementById("searchInput").addEventListener("input", e=>{
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(()=> loadStudents(normalizeDigits(e.target.value)), 350);
-});
-
-function renderStudents(){
-  const wrap = document.getElementById("listWrap");
-  if(students.length === 0){
-    wrap.innerHTML = `
-      <div class="empty">
-        <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z"/></svg>
-        <p><b>هنوز کسی ثبت نشده</b></p>
-        <p>از تب «افزودن فرد جدید» شروع کن.</p>
-      </div>`;
-    return;
-  }
-  wrap.innerHTML = students.map(st => {
-    const chips = ITEMS.map(it => {
-      const on = st["item_"+it.key];
-      const count = st["item_"+it.key+"_count"];
-      return `<span class="chip ${on?'on':''}">${it.label}${on && count ? ' × '+count : ''}</span>`;
-    }).join("");
-    return `
-    <div class="card" data-id="${st.id}">
-      <div class="card-head">
-        ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
-        <h3>${esc(st.full_name)}</h3>
-        <span class="code-pill">کد ${esc(st.tuition_code)}</span>
-      </div>
-      <div class="meta-row">
-        ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
-        ${st.hall_number ? `<span>سالن <b>${esc(st.hall_number)}</b></span>`:""}
-        ${st.room_number ? `<span>اتاق <b>${esc(st.room_number)}</b>شرقی</span>`:""}
-        ${st.fingerprint_number ? `<span>شماره انگشتی <b>${esc(st.fingerprint_number)}</b></span>`:""}
-        ${st.phone ? `<span dir="ltr">${esc(st.phone)}</span>`:""}
-      </div>
-      <div class="checklist-mini">${chips}</div>
-      <div class="divider"></div>
-      <div class="card-actions">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editStudent('${st.id}')">ویرایش</button>
-        <button class="btn btn-danger btn-sm" style="flex:1" onclick="askDeleteStudent('${st.id}','${esc(st.full_name)}')">حذف</button>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-/* ========================= خروجی‌گیری ========================= */
-function itemsSummary(st){
-  return ITEMS.filter(it => st["item_"+it.key])
-    .map(it => `${it.label}×${st["item_"+it.key+"_count"]||0}`)
-    .join("، ") || "—";
-}
-function exportRows(){
-  return students.map((st, i) => ({
-    "ردیف": i+1,
-    "نام و نام خانوادگی": st.full_name || "",
-    "کد شهریه": st.tuition_code || "",
-    "گروه": st.group_name || "",
-    "شماره سالن": st.hall_number || "",
-    "شماره اتاق": st.room_number || "",
-    "شماره انگشتی": st.fingerprint_number || "",
-    "موبایل": st.phone || "",
-    "لوازم تحویلی": itemsSummary(st),
-  }));
-}
-function exportFileName(ext){
-  const d = new Date();
-  const p = n => String(n).padStart(2,"0");
-  return `ساکنان-خوابگاه-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.${ext}`;
-}
-function downloadBlob(blob, filename){
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=> URL.revokeObjectURL(url), 2000);
-}
-
-document.getElementById("exportExcelBtn").addEventListener("click", ()=>{
-  if(students.length === 0){ toast("لیستی برای خروجی وجود ندارد.", true); return; }
-  const rows = exportRows();
-  const ws = XLSX.utils.json_to_sheet(rows);
-  ws["!cols"] = [{wch:6},{wch:24},{wch:14},{wch:12},{wch:12},{wch:12},{wch:14},{wch:30}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "ساکنان");
-  XLSX.writeFile(wb, exportFileName("xlsx"));
-});
-
-document.getElementById("exportWordBtn").addEventListener("click", ()=>{
-  if(students.length === 0){ toast("لیستی برای خروجی وجود ندارد.", true); return; }
-  const rows = exportRows();
-  const headers = Object.keys(rows[0]);
-  const tableHtml = `
-    <table dir="rtl" style="width:100%;border-collapse:collapse;font-family:Tahoma,Arial;font-size:12px">
-      <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:6px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
-      <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td style="border:1px solid #999;padding:6px">${esc(r[h])}</td>`).join("")}</tr>`).join("")}</tbody>
-    </table>`;
-  const docHtml = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head><meta charset="utf-8"><title>فهرست ساکنان</title></head>
-    <body dir="rtl" style="font-family:Tahoma,Arial">
-      <h2 style="text-align:center">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
-      <p style="text-align:center;color:#666">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")}</p>
-      ${tableHtml}
-    </body></html>`;
-  const blob = new Blob(['\ufeff', docHtml], { type: "application/msword" });
-  downloadBlob(blob, exportFileName("doc"));
-});
-
-document.getElementById("exportPdfBtn").addEventListener("click", async ()=>{
-  if(students.length === 0){ toast("لیستی برای خروجی وجود ندارد.", true); return; }
-  const btn = document.getElementById("exportPdfBtn");
-  btn.disabled = true; const orig = btn.textContent; btn.textContent = "در حال ساخت...";
-  try{
-    const rows = exportRows();
-    const headers = ["عکس", ...Object.keys(rows[0])];
-    const holder = document.createElement("div");
-    holder.style.cssText = "position:fixed;left:-9999px;top:0;width:1050px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial";
-    holder.innerHTML = `
-      <div dir="rtl">
-        <h2 style="text-align:center;margin:0 0 4px">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
-        <p style="text-align:center;color:#666;margin:0 0 16px">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")} — تعداد: ${rows.length} نفر</p>
-        <table dir="rtl" style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:8px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
-          <tbody>${rows.map((r,i)=>{
-            const st = students[i];
-            const photoCell = st && st.photo_url
-              ? `<img class="pdf-photo" src="${esc(st.photo_url)}" crossorigin="anonymous" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;margin:0 auto">`
-              : `<div style="width:34px;height:34px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">${esc((st && st.full_name || "?").trim().charAt(0))}</div>`;
-            return `<tr style="background:${i%2?'#F7F3EA':'#fff'}">
-              <td style="border:1px solid #999;padding:6px;text-align:center">${photoCell}</td>
-              ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}
-            </tr>`;
-          }).join("")}</tbody>
-        </table>
-      </div>`;
-    document.body.appendChild(holder);
-
-    const imgs = Array.from(holder.querySelectorAll("img.pdf-photo"));
-    await Promise.all(imgs.map(img => new Promise(resolve => {
-      if(img.complete){ resolve(); return; }
-      img.onload = () => resolve();
-      img.onerror = () => { img.style.display = "none"; resolve(); };
-    })));
-
-    const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff", useCORS: true });
-    document.body.removeChild(holder);
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW - 16;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    let heightLeft = imgH;
-    let position = 8;
-    const imgData = canvas.toDataURL("image/png");
-
-    pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
-    heightLeft -= (pageH - 16);
-    while(heightLeft > 0){
-      position = heightLeft - imgH + 8;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
-      heightLeft -= (pageH - 16);
-    }
-    pdf.save(exportFileName("pdf"));
-  }catch(err){
-    toast("خطا در ساخت PDF: " + err.message, true);
-  }finally{
-    btn.disabled = false; btn.textContent = orig;
-  }
-});
-
-/* ========================= آپلود عکس ========================= */
-let currentPhotoData = "";
-
-function setPhotoPreview(url){
-  currentPhotoData = url || "";
-  const img = document.getElementById("photoPreview");
-  const txt = document.getElementById("photoDropText");
-  const removeBtn = document.getElementById("photoRemoveBtn");
-  if(currentPhotoData){
-    img.src = currentPhotoData;
-    img.style.display = "block";
-    txt.style.display = "none";
-    removeBtn.style.display = "flex";
-  } else {
-    img.style.display = "none";
-    img.src = "";
-    txt.style.display = "flex";
-    removeBtn.style.display = "none";
-  }
-}
-
-const PHOTO_MAX_BYTES = 1.5 * 1024 * 1024; // 1.5MB
-
-function loadImageFromFile(file){
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("فایل تصویری خوانده نشد")); };
-    img.src = url;
-  });
-}
-
-async function compressImageToDataURL(file, maxBytes = PHOTO_MAX_BYTES){
-  const img = await loadImageFromFile(file);
-  let { width, height } = img;
-  const maxDim = 1280;
-  if(width > maxDim || height > maxDim){
-    const ratio = Math.min(maxDim / width, maxDim / height);
-    width = Math.round(width * ratio);
-    height = Math.round(height * ratio);
-  }
-  const canvas = document.createElement("canvas");
-  canvas.width = width; canvas.height = height;
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(img, 0, 0, width, height);
-
-  let quality = 0.85;
-  let dataUrl = canvas.toDataURL("image/jpeg", quality);
-  while(dataUrl.length > maxBytes && quality > 0.35){
-    quality -= 0.1;
-    dataUrl = canvas.toDataURL("image/jpeg", quality);
-  }
-  while(dataUrl.length > maxBytes && (canvas.width > 400 || canvas.height > 400)){
-    canvas.width = Math.round(canvas.width * 0.85);
-    canvas.height = Math.round(canvas.height * 0.85);
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    dataUrl = canvas.toDataURL("image/jpeg", quality);
-  }
-  return dataUrl;
-}
-
-async function readFileAsPhoto(file){
-  const allowedTypes = ["image/png", "image/webp", "image/jpeg"];
-  const ext = (file.name.split(".").pop() || "").toLowerCase();
-  const allowedExts = ["png", "webp", "jpg", "jpeg"];
-  if(!file || !(allowedTypes.includes(file.type) || allowedExts.includes(ext))){
-    toast("فقط فرمت‌های PNG، WEBP، JPG و JPEG مجاز است.", true);
-    return;
-  }
-  if(file.size > 20 * 1024 * 1024){
-    toast("حجم عکس نباید بیشتر از ۲۰ مگابایت باشد.", true);
-    return;
-  }
-  const dropText = document.getElementById("photoDropText");
-  const dropTextOrig = dropText.innerHTML;
-  dropText.innerHTML = `<span>در حال فشرده‌سازی عکس...</span>`;
-  try{
-    const dataUrl = await compressImageToDataURL(file);
-    setPhotoPreview(dataUrl);
-    document.getElementById("f_photo_url").value = "";
-  }catch(err){
-    toast("خطا در پردازش عکس: " + err.message, true);
-    dropText.innerHTML = dropTextOrig;
-  }
-}
-
-(function initPhotoUpload(){
-  const drop = document.getElementById("photoDrop");
-  const fileInput = document.getElementById("photoFileInput");
-  const urlInput = document.getElementById("f_photo_url");
-  const removeBtn = document.getElementById("photoRemoveBtn");
-
-  drop.addEventListener("click", (e)=>{
-    if(e.target === removeBtn) return;
-    fileInput.click();
-  });
-  fileInput.addEventListener("change", ()=>{
-    if(fileInput.files && fileInput.files[0]) readFileAsPhoto(fileInput.files[0]);
-    fileInput.value = "";
-  });
-  ["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, (e)=>{
-    e.preventDefault(); e.stopPropagation(); drop.classList.add("dragover");
-  }));
-  ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, (e)=>{
-    e.preventDefault(); e.stopPropagation(); drop.classList.remove("dragover");
-  }));
-  drop.addEventListener("drop", (e)=>{
-    const file = e.dataTransfer.files && e.dataTransfer.files[0];
-    if(file) readFileAsPhoto(file);
-  });
-  removeBtn.addEventListener("click", (e)=>{
-    e.stopPropagation();
-    setPhotoPreview("");
-    urlInput.value = "";
-  });
-  urlInput.addEventListener("input", ()=>{
-    const v = urlInput.value.trim();
-    if(v) setPhotoPreview(v);
-    else setPhotoPreview("");
-  });
-})();
-
-/* ========================= فرم گروه ========================= */
-function buildGroupOptions(){
-  const sel = document.getElementById("f_group_name");
-  sel.innerHTML = `<option value="">— انتخاب کنید —</option>` +
-    GROUPS.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
-}
-function buildHallOptions(){
-  const sel = document.getElementById("f_hall_number");
-  sel.innerHTML = `<option value="">— انتخاب کنید —</option>` +
-    HALLS.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
-}
-
-/* ========================= فرم لوازم ========================= */
-function buildItemsForm(){
-  const wrap = document.getElementById("itemsWrap");
-  wrap.innerHTML = ITEMS.map(it => `
-    <div class="item-row" id="row_${it.key}" data-key="${it.key}">
-      <div class="checkbox" id="chk_${it.key}" onclick="toggleItem('${it.key}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#0F3A3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6">${it.icon}</svg>
-      <div class="item-name">${it.label}</div>
-      <div class="stepper">
-        <button type="button" onclick="stepItem('${it.key}',1)">+</button>
-        <input type="number" min="0" id="cnt_${it.key}" value="1" oninput="onCountInput('${it.key}')">
-        <button type="button" onclick="stepItem('${it.key}',-1)">−</button>
-      </div>
-    </div>
-  `).join("");
-}
-function toggleItem(key){
-  const row = document.getElementById("row_"+key);
-  const chk = document.getElementById("chk_"+key);
-  const on = !row.classList.contains("checked");
-  row.classList.toggle("checked", on);
-  chk.classList.toggle("checked", on);
-  const cnt = document.getElementById("cnt_"+key);
-  if(on && (!cnt.value || Number(cnt.value) < 1)) cnt.value = 1;
-}
-function stepItem(key, delta){
-  const row = document.getElementById("row_"+key);
-  if(!row.classList.contains("checked")) return;
-  const cnt = document.getElementById("cnt_"+key);
-  let v = Math.max(0, (Number(cnt.value)||0) + delta);
-  cnt.value = v;
-}
-function onCountInput(key){
-  const cnt = document.getElementById("cnt_"+key);
-  if(Number(cnt.value) < 0) cnt.value = 0;
-}
-function setItemState(key, checked, count){
-  const row = document.getElementById("row_"+key);
-  const chk = document.getElementById("chk_"+key);
-  row.classList.toggle("checked", !!checked);
-  chk.classList.toggle("checked", !!checked);
-  document.getElementById("cnt_"+key).value = count || (checked ? 1 : 0);
-}
-
-/* ========================= افزودن / ویرایش ========================= */
-function resetForm(){
-  editingId = null;
-  document.getElementById("formTitle").textContent = "افزودن فرد جدید";
-  document.getElementById("saveBtn").textContent = "ثبت اطلاعات";
-  document.getElementById("cancelEditBtn").style.display = "none";
-  ["full_name","tuition_code","phone","group_name","hall_number","room_number","fingerprint_number"].forEach(k=>{
-    document.getElementById("f_"+k).value = "";
-  });
-  setPhotoPreview("");
-  ITEMS.forEach(it => setItemState(it.key, false, 0));
-  showMsg("formMsg","");
-}
-
-window.editStudent = function(id){
-  const st = students.find(s => s.id === id);
-  if(!st) return;
-  editingId = id;
-  document.getElementById("formTitle").textContent = "ویرایش اطلاعات";
-  document.getElementById("saveBtn").textContent = "ذخیره تغییرات";
-  document.getElementById("cancelEditBtn").style.display = "inline-flex";
-  document.getElementById("f_full_name").value = st.full_name || "";
-  document.getElementById("f_tuition_code").value = st.tuition_code || "";
-  document.getElementById("f_phone").value = st.phone || "";
-  document.getElementById("f_group_name").value = st.group_name || "";
-  document.getElementById("f_photo_url").value = (st.photo_url && st.photo_url.startsWith("http")) ? st.photo_url : "";
-  setPhotoPreview(st.photo_url || "");
-  document.getElementById("f_hall_number").value = st.hall_number || "";
-  document.getElementById("f_room_number").value = st.room_number || "";
-  document.getElementById("f_fingerprint_number").value = st.fingerprint_number || "";
-  ITEMS.forEach(it => setItemState(it.key, st["item_"+it.key], st["item_"+it.key+"_count"]));
-  showMsg("formMsg","");
-  goTab("add");
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
-document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
-
-document.getElementById("saveBtn").addEventListener("click", async ()=>{
-  const payload = {
-    full_name: document.getElementById("f_full_name").value.trim(),
-    tuition_code: document.getElementById("f_tuition_code").value.trim(),
-    phone: document.getElementById("f_phone").value.trim(),
-    group_name: document.getElementById("f_group_name").value,
-    photo_url: currentPhotoData,
-    hall_number: document.getElementById("f_hall_number").value.trim(),
-    room_number: document.getElementById("f_room_number").value.trim(),
-    fingerprint_number: document.getElementById("f_fingerprint_number").value.trim(),
-  };
-  ITEMS.forEach(it => {
-    const checked = document.getElementById("row_"+it.key).classList.contains("checked");
-    payload["item_"+it.key] = checked;
-    payload["item_"+it.key+"_count"] = checked ? (Number(document.getElementById("cnt_"+it.key).value)||0) : 0;
-  });
-
-  if(!payload.full_name || !payload.tuition_code){
-    showMsg("formMsg","نام و نام خانوادگی و کد شهریه الزامی است.");
-    return;
-  }
-  showMsg("formMsg","");
-  const btn = document.getElementById("saveBtn");
-  const btnOrigText = btn.textContent;
-  btn.disabled = true; btn.textContent = "در حال ذخیره...";
-  try{
-    if(editingId){
-      await callRpc("rpc_update_student", { p_token: session.token, p_id: editingId, p_data: payload });
-      toast("تغییرات ذخیره شد.");
-    }else{
-      await callRpc("rpc_add_student", { p_token: session.token, p_data: payload });
-      toast("فرد جدید با موفقیت اضافه شد.");
-    }
-    resetForm();
-    await loadStudents();
-    goTab("list");
-  }catch(err){
-    showMsg("formMsg", err.message);
-    btn.textContent = btnOrigText;
-  }finally{
-    btn.disabled = false;
-  }
-});
-
-window.askDeleteStudent = function(id, name){
-  openConfirm(`حذف «${name}»`, "اطلاعات این فرد برای همیشه حذف می‌شود. مطمئن هستید؟", async ()=>{
-    try{
-      await callRpc("rpc_delete_student", { p_token: session.token, p_id: id });
-      toast("حذف شد.");
-      loadStudents(normalizeDigits(document.getElementById("searchInput").value));
-    }catch(err){
-      toast(err.message, true);
-    }
-  });
-}
-
-/* ========================= مدیریت ادمین‌ها ========================= */
-let admins = [];
-let editingAdminId = null;
-
-async function loadAdmins(){
-  if(!session.admin.is_super) return;
-  const wrap = document.getElementById("adminsListWrap");
-  wrap.innerHTML = `<div class="skeleton" style="height:60px"></div>`;
-  try{
-    admins = await callRpc("rpc_list_admins", { p_token: session.token }) || [];
-    renderAdmins(admins);
-  }catch(err){
-    wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
-  }
-}
-function renderAdmins(list){
-  const wrap = document.getElementById("adminsListWrap");
-  if(list.length === 0){ wrap.innerHTML = ""; return; }
-  wrap.innerHTML = list.map(a => `
-    <div class="admin-row">
-      <div class="info">
-        <b>${esc(a.full_name)} ${a.is_super ? '<span class="super-tag">سوپر ادمین</span>' : ''}</b>
-        <span dir="ltr">@${esc(a.username)}</span>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" onclick="startEditAdmin('${a.id}')">ویرایش</button>
-        ${a.id === session.admin.id ? '' : `<button class="btn btn-danger btn-sm" onclick="askDeleteAdmin('${a.id}','${esc(a.full_name)}')">حذف</button>`}
-      </div>
-    </div>
-  `).join("");
-}
-
-function resetAdminForm(){
-  editingAdminId = null;
-  document.getElementById("adminFormTitle").textContent = "افزودن ادمین جدید";
-  document.getElementById("adminFormHint").textContent = "یک حساب کاربری برای همکار جدید بساز.";
-  document.getElementById("addAdminBtn").textContent = "افزودن ادمین";
-  document.getElementById("cancelEditAdminBtn").style.display = "none";
-  document.getElementById("a_password_label").textContent = "رمز عبور";
-  document.getElementById("a_password").placeholder = "حداقل ۴ کاراکتر";
-  document.getElementById("a_full_name").value = "";
-  document.getElementById("a_username").value = "";
-  document.getElementById("a_password").value = "";
-  document.getElementById("a_is_super").value = "false";
-  document.getElementById("a_is_super").disabled = false;
-  showMsg("adminMsg","");
-}
-
-window.startEditAdmin = function(id){
-  const a = admins.find(x => x.id === id);
-  if(!a) return;
-  editingAdminId = id;
-  document.getElementById("adminFormTitle").textContent = "ویرایش ادمین";
-  document.getElementById("adminFormHint").textContent = "برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذار.";
-  document.getElementById("addAdminBtn").textContent = "ذخیره تغییرات";
-  document.getElementById("cancelEditAdminBtn").style.display = "inline-flex";
-  document.getElementById("a_password_label").textContent = "رمز عبور جدید";
-  document.getElementById("a_password").placeholder = "خالی = بدون تغییر";
-  document.getElementById("a_full_name").value = a.full_name || "";
-  document.getElementById("a_username").value = a.username || "";
-  document.getElementById("a_password").value = "";
-  document.getElementById("a_is_super").value = a.is_super ? "true" : "false";
-  // یک سوپر ادمین نمی‌تواند سطح دسترسی خودش را از همین‌جا پایین بیاورد
-  document.getElementById("a_is_super").disabled = (a.id === session.admin.id);
-  showMsg("adminMsg","");
-  window.scrollTo({top:0, behavior:"smooth"});
-}
-
-document.getElementById("cancelEditAdminBtn").addEventListener("click", resetAdminForm);
-
-document.getElementById("addAdminBtn").addEventListener("click", async ()=>{
-  const full_name = document.getElementById("a_full_name").value.trim();
-  const username = document.getElementById("a_username").value.trim();
-  const password = document.getElementById("a_password").value;
-  const is_super = document.getElementById("a_is_super").value === "true";
-  showMsg("adminMsg","");
-
-  const btn = document.getElementById("addAdminBtn");
-
-  if(editingAdminId){
-    if(!full_name || !username){
-      showMsg("adminMsg","نام و نام کاربری الزامی است.");
-      return;
-    }
-    btn.disabled = true;
-    try{
-      await callRpc("rpc_update_admin", {
-        p_token: session.token, p_admin_id: editingAdminId,
-        p_full_name: full_name, p_username: username,
-        p_password: password || null, p_is_super: is_super
+    /* ========================= ابزار ========================= */
+    function normalizeDigits(str) {
+      if (!str) return str;
+      const fa = "۰۱۲۳۴۵۶۷۸۹",
+        ar = "٠١٢٣٤٥٦٧٨٩";
+      return String(str).replace(/[۰-۹٠-٩]/g, ch => {
+        let i = fa.indexOf(ch);
+        if (i > -1) return i;
+        i = ar.indexOf(ch);
+        if (i > -1) return i;
+        return ch;
       });
-      toast("اطلاعات ادمین ذخیره شد.");
-      resetAdminForm();
-      loadAdmins();
-    }catch(err){
-      showMsg("adminMsg", err.message);
-    }finally{
-      btn.disabled = false;
     }
-    return;
-  }
 
-  if(!full_name || !username || !password){
-    showMsg("adminMsg","همه فیلدها الزامی است.");
-    return;
-  }
-  btn.disabled = true;
-  try{
-    await callRpc("rpc_add_admin", { p_token: session.token, p_username: username, p_password: password, p_full_name: full_name, p_is_super: is_super });
-    toast("ادمین جدید اضافه شد.");
-    resetAdminForm();
-    loadAdmins();
-  }catch(err){
-    showMsg("adminMsg", err.message);
-  }finally{
-    btn.disabled = false;
-  }
-});
-
-window.askDeleteAdmin = function(id, name){
-  openConfirm(`حذف ادمین «${name}»`, "این حساب کاربری دیگر نمی‌تواند وارد سامانه شود. مطمئن هستید؟", async ()=>{
-    try{
-      await callRpc("rpc_delete_admin", { p_token: session.token, p_admin_id: id });
-      toast("ادمین حذف شد.");
-      loadAdmins();
-    }catch(err){
-      toast(err.message, true);
+    function toast(msg, isErr = false) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = "toast show" + (isErr ? " err" : "");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.className = "toast", 2500);
     }
-  });
-}
 
-/* ========================= ویرایش حساب خودم ========================= */
-document.getElementById("myProfileBtn").addEventListener("click", ()=>{
-  document.getElementById("p_full_name").value = session.admin.full_name || "";
-  document.getElementById("p_username").value = session.admin.username || "";
-  document.getElementById("p_password").value = "";
-  showMsg("profileMsg","");
-  document.getElementById("profileModal").classList.add("show");
-});
-document.getElementById("profileCancelBtn").addEventListener("click", ()=>{
-  document.getElementById("profileModal").classList.remove("show");
-});
-document.getElementById("profileModal").addEventListener("click", e=>{
-  if(e.target.id === "profileModal") document.getElementById("profileModal").classList.remove("show");
-});
-document.getElementById("profileSaveBtn").addEventListener("click", async ()=>{
-  const full_name = document.getElementById("p_full_name").value.trim();
-  const username = document.getElementById("p_username").value.trim();
-  const password = document.getElementById("p_password").value;
-  showMsg("profileMsg","");
-  if(!full_name || !username){
-    showMsg("profileMsg","نام و نام کاربری الزامی است.");
-    return;
-  }
-  const btn = document.getElementById("profileSaveBtn");
-  btn.disabled = true;
-  try{
-    const updated = await callRpc("rpc_update_admin", {
-      p_token: session.token, p_admin_id: session.admin.id,
-      p_full_name: full_name, p_username: username,
-      p_password: password || null, p_is_super: null
+    function showMsg(id, text) {
+      const el = document.getElementById(id);
+      if (!text) { el.className = "msg error";
+        el.textContent = ""; return; }
+      el.textContent = text;
+      el.className = "msg error show";
+    }
+
+    function esc(s) {
+      return (s ?? "").toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+        "'": '&#39;' } [m]));
+    }
+
+    async function callRpc(name, params, timeoutMs = 20000) {
+      const timeout = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(
+          "درخواست بیش از حد طول کشید. اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.")), timeoutMs);
+      });
+      const { data, error } = await Promise.race([sb.rpc(name, params), timeout]);
+      if (error) throw new Error(error.message || "خطایی رخ داد.");
+      return data;
+    }
+
+    function saveSession(s) {
+      session = s;
+      localStorage.setItem("dorm_session", JSON.stringify(s));
+    }
+
+    function clearSession() {
+      session = null;
+      localStorage.removeItem("dorm_session");
+    }
+
+    /* ========================= ورود ========================= */
+    document.getElementById("loginBtn").addEventListener("click", doLogin);
+    document.getElementById("loginPass").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+    document.getElementById("loginUser").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+
+    async function doLogin() {
+      const username = document.getElementById("loginUser").value.trim();
+      const password = document.getElementById("loginPass").value;
+      showMsg("loginMsg", "");
+      if (!username || !password) { showMsg("loginMsg", "نام کاربری و رمز عبور را وارد کنید."); return; }
+      const btn = document.getElementById("loginBtn");
+      btn.disabled = true;
+      btn.textContent = "در حال ورود...";
+      try {
+        const data = await callRpc("rpc_login", { p_username: username, p_password: password });
+        saveSession(data);
+        enterApp();
+      } catch (err) {
+        showMsg("loginMsg", err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "ورود به سامانه";
+      }
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try { if (session) await callRpc("rpc_logout", { p_token: session.token }); } catch (e) {}
+      clearSession();
+      location.reload();
     });
-    session.admin.full_name = updated.full_name;
-    session.admin.username = updated.username;
-    saveSession(session);
-    document.getElementById("whoName").textContent = session.admin.full_name;
-    document.getElementById("profileModal").classList.remove("show");
-    toast("اطلاعات حساب شما ذخیره شد.");
-  }catch(err){
-    showMsg("profileMsg", err.message);
-  }finally{
-    btn.disabled = false;
-  }
-});
 
-/* ========================= مودال تایید ========================= */
-function openConfirm(title, text, action){
-  document.getElementById("confirmTitle").textContent = title;
-  document.getElementById("confirmText").textContent = text;
-  confirmAction = action;
-  document.getElementById("confirmModal").classList.add("show");
-}
-document.getElementById("confirmNo").addEventListener("click", ()=>{
-  document.getElementById("confirmModal").classList.remove("show");
-  confirmAction = null;
-});
-document.getElementById("confirmYes").addEventListener("click", async ()=>{
-  document.getElementById("confirmModal").classList.remove("show");
-  if(confirmAction) await confirmAction();
-  confirmAction = null;
-});
-document.getElementById("confirmModal").addEventListener("click", e=>{
-  if(e.target.id === "confirmModal") document.getElementById("confirmModal").classList.remove("show");
-});
-</script>
+    /* ========================= ورود به اپ ========================= */
+    function enterApp() {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("app").className = "show";
+      document.getElementById("whoName").textContent = session.admin.full_name;
+      document.getElementById("whoRole").textContent = session.admin.is_super ? "سوپر ادمین" : "ادمین";
+      document.getElementById("tabAdmins").style.display = session.admin.is_super ? "inline-block" : "none";
+      buildGroupOptions();
+      buildItemsForm();
+      loadStudents();
+    }
+
+    async function checkSession() {
+      if (!session) return;
+      try {
+        await callRpc("rpc_whoami", { p_token: session.token });
+        enterApp();
+      } catch (e) {
+        clearSession();
+      }
+    }
+    checkSession();
+
+    /* ========================= تب‌ها ========================= */
+    document.getElementById("tabs").addEventListener("click", e => {
+      const btn = e.target.closest("button[data-tab]");
+      if (!btn) return;
+      document.querySelectorAll("#tabs button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById("sec-" + btn.dataset.tab).classList.add("active");
+      if (btn.dataset.tab === "add" && !editingId) resetForm();
+      if (btn.dataset.tab === "admins") { if (!editingAdminId) resetAdminForm();
+        loadAdmins(); }
+    });
+
+    function goTab(tab) {
+      document.querySelector(`#tabs button[data-tab="${tab}"]`).click();
+    }
+
+    /* ========================= فهرست ساکنان ========================= */
+    async function loadStudents(search = "") {
+      const wrap = document.getElementById("listWrap");
+      wrap.innerHTML =
+        `<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>`;
+      try {
+        students = await callRpc("rpc_list_students", { p_token: session.token, p_search: search || null });
+        renderStudents();
+      } catch (err) {
+        wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", () => loadStudents(normalizeDigits(document
+      .getElementById("searchInput").value)));
+    let searchTimer;
+    document.getElementById("searchInput").addEventListener("input", e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => loadStudents(normalizeDigits(e.target.value)), 350);
+    });
+
+    function renderStudents() {
+      const wrap = document.getElementById("listWrap");
+      if (students.length === 0) {
+        wrap.innerHTML = `
+          <div class="empty">
+            <svg class="mark" viewBox="0 0 100 100"><path d="M50 4 L79 25 L90 58 L67 84 L33 84 L10 58 L21 25 Z"/></svg>
+            <p><b>هنوز کسی ثبت نشده</b></p>
+            <p>از تب «افزودن فرد جدید» شروع کن.</p>
+          </div>`;
+        return;
+      }
+      wrap.innerHTML = students.map(st => {
+        const chips = ITEMS.map(it => {
+          const on = st["item_" + it.key];
+          const count = st["item_" + it.key + "_count"];
+          return `<span class="chip ${on?'on':''}">${it.label}${on && count ? ' × '+count : ''}</span>`;
+        }).join("");
+        return `
+        <div class="card" data-id="${st.id}">
+          <div class="card-head">
+            ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
+            <h3>${esc(st.full_name)}</h3>
+            <span class="code-pill">کد ${esc(st.tuition_code)}</span>
+          </div>
+          <div class="meta-row">
+            ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
+            ${st.hall_number ? `<span>سالن <b>${esc(st.hall_number)}</b></span>`:""}
+            ${st.room_number ? `<span>اتاق <b>${esc(st.room_number)}</b></span>`:""}
+            ${st.fingerprint_number ? `<span>شماره انگشتی <b>${esc(st.fingerprint_number)}</b></span>`:""}
+            ${st.phone ? `<span dir="ltr">${esc(st.phone)}</span>`:""}
+          </div>
+          <div class="checklist-mini">${chips}</div>
+          <div class="divider"></div>
+          <div class="card-actions">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editStudent('${st.id}')">ویرایش</button>
+            <button class="btn btn-danger btn-sm" style="flex:1" onclick="askDeleteStudent('${st.id}','${esc(st.full_name)}')">حذف</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    /* ========================= خروجی‌گیری ========================= */
+    function itemsSummary(st) {
+      return ITEMS.filter(it => st["item_" + it.key])
+        .map(it => `${it.label}×${st["item_"+it.key+"_count"]||0}`)
+        .join("، ") || "—";
+    }
+
+    function exportRows() {
+      return students.map((st, i) => ({
+        "ردیف": i + 1,
+        "نام و نام خانوادگی": st.full_name || "",
+        "کد شهریه": st.tuition_code || "",
+        "گروه": st.group_name || "",
+        "شماره سالن": st.hall_number || "",
+        "شماره اتاق": st.room_number || "",
+        "شماره انگشتی": st.fingerprint_number || "",
+        "موبایل": st.phone || "",
+        "لوازم تحویلی": itemsSummary(st),
+      }));
+    }
+
+    function exportFileName(ext) {
+      const d = new Date();
+      const p = n => String(n).padStart(2, "0");
+      return `ساکنان-خوابگاه-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.${ext}`;
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+    document.getElementById("exportExcelBtn").addEventListener("click", () => {
+      if (students.length === 0) { toast("لیستی برای خروجی وجود ندارد.", true); return; }
+      const rows = exportRows();
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws["!cols"] = [{ wch: 6 }, { wch: 24 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 30 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "ساکنان");
+      XLSX.writeFile(wb, exportFileName("xlsx"));
+    });
+
+    document.getElementById("exportWordBtn").addEventListener("click", () => {
+      if (students.length === 0) { toast("لیستی برای خروجی وجود ندارد.", true); return; }
+      const rows = exportRows();
+      const headers = Object.keys(rows[0]);
+      const tableHtml = `
+        <table dir="rtl" style="width:100%;border-collapse:collapse;font-family:Tahoma,Arial;font-size:12px">
+          <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:6px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
+          <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td style="border:1px solid #999;padding:6px">${esc(r[h])}</td>`).join("")}</tr>`).join("")}</tbody>
+        </table>`;
+      const docHtml = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="utf-8"><title>فهرست ساکنان</title></head>
+        <body dir="rtl" style="font-family:Tahoma,Arial">
+          <h2 style="text-align:center">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
+          <p style="text-align:center;color:#666">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")}</p>
+          ${tableHtml}
+        </body></html>`;
+      const blob = new Blob(['\ufeff', docHtml], { type: "application/msword" });
+      downloadBlob(blob, exportFileName("doc"));
+    });
+
+    document.getElementById("exportPdfBtn").addEventListener("click", async () => {
+      if (students.length === 0) { toast("لیستی برای خروجی وجود ندارد.", true); return; }
+      const btn = document.getElementById("exportPdfBtn");
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = "در حال ساخت...";
+      try {
+        const rows = exportRows();
+        const headers = ["عکس", ...Object.keys(rows[0])];
+        const holder = document.createElement("div");
+        holder.style.cssText =
+          "position:fixed;left:-9999px;top:0;width:1050px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial";
+        holder.innerHTML = `
+          <div dir="rtl">
+            <h2 style="text-align:center;margin:0 0 4px">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
+            <p style="text-align:center;color:#666;margin:0 0 16px">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")} — تعداد: ${rows.length} نفر</p>
+            <table dir="rtl" style="width:100%;border-collapse:collapse;font-size:13px">
+              <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:8px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
+              <tbody>${rows.map((r,i)=>{
+                const st = students[i];
+                const photoCell = st && st.photo_url
+                  ? `<img class="pdf-photo" src="${esc(st.photo_url)}" crossorigin="anonymous" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;margin:0 auto">`
+                  : `<div style="width:34px;height:34px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">${esc((st && st.full_name || "?").trim().charAt(0))}</div>`;
+                return `<tr style="background:${i%2?'#F7F3EA':'#fff'}">
+                  <td style="border:1px solid #999;padding:6px;text-align:center">${photoCell}</td>
+                  ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}
+                </tr>`;
+              }).join("")}</tbody>
+            </table>
+          </div>`;
+        document.body.appendChild(holder);
+
+        const imgs = Array.from(holder.querySelectorAll("img.pdf-photo"));
+        await Promise.all(imgs.map(img => new Promise(resolve => {
+          if (img.complete) { resolve(); return; }
+          img.onload = () => resolve();
+          img.onerror = () => { img.style.display = "none";
+            resolve(); };
+        })));
+
+        const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff", useCORS: true });
+        document.body.removeChild(holder);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const imgW = pageW - 16;
+        const imgH = (canvas.height * imgW) / canvas.width;
+        let heightLeft = imgH;
+        let position = 8;
+        const imgData = canvas.toDataURL("image/png");
+
+        pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
+        heightLeft -= (pageH - 16);
+        while (heightLeft > 0) {
+          position = heightLeft - imgH + 8;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
+          heightLeft -= (pageH - 16);
+        }
+        pdf.save(exportFileName("pdf"));
+      } catch (err) {
+        toast("خطا در ساخت PDF: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    });
+
+    /* ========================= آپلود عکس ========================= */
+    let currentPhotoData = "";
+
+    function setPhotoPreview(url) {
+      currentPhotoData = url || "";
+      const img = document.getElementById("photoPreview");
+      const txt = document.getElementById("photoDropText");
+      const removeBtn = document.getElementById("photoRemoveBtn");
+      if (currentPhotoData) {
+        img.src = currentPhotoData;
+        img.style.display = "block";
+        txt.style.display = "none";
+        removeBtn.style.display = "flex";
+      } else {
+        img.style.display = "none";
+        img.src = "";
+        txt.style.display = "flex";
+        removeBtn.style.display = "none";
+      }
+    }
+
+    const PHOTO_MAX_BYTES = 1.5 * 1024 * 1024; // 1.5MB
+
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => { URL.revokeObjectURL(url);
+          resolve(img); };
+        img.onerror = () => { URL.revokeObjectURL(url);
+          reject(new Error("فایل تصویری خوانده نشد")); };
+        img.src = url;
+      });
+    }
+
+    async function compressImageToDataURL(file, maxBytes = PHOTO_MAX_BYTES) {
+      const img = await loadImageFromFile(file);
+      let { width, height } = img;
+      const maxDim = 1280;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      let quality = 0.85;
+      let dataUrl = canvas.toDataURL("image/jpeg", quality);
+      while (dataUrl.length > maxBytes && quality > 0.35) {
+        quality -= 0.1;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+      while (dataUrl.length > maxBytes && (canvas.width > 400 || canvas.height > 400)) {
+        canvas.width = Math.round(canvas.width * 0.85);
+        canvas.height = Math.round(canvas.height * 0.85);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+      return dataUrl;
+    }
+
+    async function readFileAsPhoto(file) {
+      const allowedTypes = ["image/png", "image/webp", "image/jpeg"];
+      const ext = (file.name.split(".").pop() || "").toLowerCase();
+      const allowedExts = ["png", "webp", "jpg", "jpeg"];
+      if (!file || !(allowedTypes.includes(file.type) || allowedExts.includes(ext))) {
+        toast("فقط فرمت‌های PNG، WEBP، JPG و JPEG مجاز است.", true);
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        toast("حجم عکس نباید بیشتر از ۲۰ مگابایت باشد.", true);
+        return;
+      }
+      const dropText = document.getElementById("photoDropText");
+      const dropTextOrig = dropText.innerHTML;
+      dropText.innerHTML = `<span>در حال فشرده‌سازی عکس...</span>`;
+      try {
+        const dataUrl = await compressImageToDataURL(file);
+        setPhotoPreview(dataUrl);
+        document.getElementById("f_photo_url").value = "";
+      } catch (err) {
+        toast("خطا در پردازش عکس: " + err.message, true);
+        dropText.innerHTML = dropTextOrig;
+      }
+    }
+
+    (function initPhotoUpload() {
+      const drop = document.getElementById("photoDrop");
+      const fileInput = document.getElementById("photoFileInput");
+      const urlInput = document.getElementById("f_photo_url");
+      const removeBtn = document.getElementById("photoRemoveBtn");
+
+      drop.addEventListener("click", (e) => {
+        if (e.target === removeBtn) return;
+        fileInput.click();
+      });
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files && fileInput.files[0]) readFileAsPhoto(fileInput.files[0]);
+        fileInput.value = "";
+      });
+      ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        drop.classList.add("dragover");
+      }));
+      ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        drop.classList.remove("dragover");
+      }));
+      drop.addEventListener("drop", (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) readFileAsPhoto(file);
+      });
+      removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setPhotoPreview("");
+        urlInput.value = "";
+      });
+      urlInput.addEventListener("input", () => {
+        const v = urlInput.value.trim();
+        if (v) setPhotoPreview(v);
+        else setPhotoPreview("");
+      });
+    })();
+
+    /* ========================= فرم گروه ========================= */
+    function buildGroupOptions() {
+      const sel = document.getElementById("f_group_name");
+      sel.innerHTML = `<option value="">— انتخاب کنید —</option>` +
+        GROUPS.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
+    }
+
+    /* ========================= فرم لوازم ========================= */
+    function buildItemsForm() {
+      const wrap = document.getElementById("itemsWrap");
+      wrap.innerHTML = ITEMS.map(it => `
+        <div class="item-row" id="row_${it.key}" data-key="${it.key}">
+          <div class="checkbox" id="chk_${it.key}" onclick="toggleItem('${it.key}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0F3A3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.6">${it.icon}</svg>
+          <div class="item-name">${it.label}</div>
+          <div class="stepper">
+            <button type="button" onclick="stepItem('${it.key}',1)">+</button>
+            <input type="number" min="0" id="cnt_${it.key}" value="1" oninput="onCountInput('${it.key}')">
+            <button type="button" onclick="stepItem('${it.key}',-1)">−</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleItem(key) {
+      const row = document.getElementById("row_" + key);
+      const chk = document.getElementById("chk_" + key);
+      const on = !row.classList.contains("checked");
+      row.classList.toggle("checked", on);
+      chk.classList.toggle("checked", on);
+      const cnt = document.getElementById("cnt_" + key);
+      if (on && (!cnt.value || Number(cnt.value) < 1)) cnt.value = 1;
+    }
+
+    function stepItem(key, delta) {
+      const row = document.getElementById("row_" + key);
+      if (!row.classList.contains("checked")) return;
+      const cnt = document.getElementById("cnt_" + key);
+      let v = Math.max(0, (Number(cnt.value) || 0) + delta);
+      cnt.value = v;
+    }
+
+    function onCountInput(key) {
+      const cnt = document.getElementById("cnt_" + key);
+      if (Number(cnt.value) < 0) cnt.value = 0;
+    }
+
+    function setItemState(key, checked, count) {
+      const row = document.getElementById("row_" + key);
+      const chk = document.getElementById("chk_" + key);
+      row.classList.toggle("checked", !!checked);
+      chk.classList.toggle("checked", !!checked);
+      document.getElementById("cnt_" + key).value = count || (checked ? 1 : 0);
+    }
+
+    /* ========================= افزودن / ویرایش ========================= */
+    function resetForm() {
+      editingId = null;
+      document.getElementById("formTitle").textContent = "افزودن فرد جدید";
+      document.getElementById("saveBtn").textContent = "ثبت اطلاعات";
+      document.getElementById("cancelEditBtn").style.display = "none";
+      ["full_name", "tuition_code", "phone", "group_name", "room_number", "fingerprint_number"].forEach(k => {
+        document.getElementById("f_" + k).value = "";
+      });
+      // hall number input
+      document.getElementById("f_hall_number").value = "";
+      setPhotoPreview("");
+      ITEMS.forEach(it => setItemState(it.key, false, 0));
+      showMsg("formMsg", "");
+    }
+
+    window.editStudent = function(id) {
+      const st = students.find(s => s.id === id);
+      if (!st) return;
+      editingId = id;
+      document.getElementById("formTitle").textContent = "ویرایش اطلاعات";
+      document.getElementById("saveBtn").textContent = "ذخیره تغییرات";
+      document.getElementById("cancelEditBtn").style.display = "inline-flex";
+      document.getElementById("f_full_name").value = st.full_name || "";
+      document.getElementById("f_tuition_code").value = st.tuition_code || "";
+      document.getElementById("f_phone").value = st.phone || "";
+      document.getElementById("f_group_name").value = st.group_name || "";
+      document.getElementById("f_photo_url").value = (st.photo_url && st.photo_url.startsWith("http")) ? st.photo_url : "";
+      setPhotoPreview(st.photo_url || "");
+      // hall_number: extract number from "سالن X شرقی"
+      let hallVal = st.hall_number || "";
+      let match = hallVal.match(/سالن\s*(\d+)\s*شرقی/);
+      document.getElementById("f_hall_number").value = match ? match[1] : "";
+      document.getElementById("f_room_number").value = st.room_number || "";
+      document.getElementById("f_fingerprint_number").value = st.fingerprint_number || "";
+      ITEMS.forEach(it => setItemState(it.key, st["item_" + it.key], st["item_" + it.key + "_count"]));
+      showMsg("formMsg", "");
+      goTab("add");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.getElementById("cancelEditBtn").addEventListener("click", resetForm);
+
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const payload = {
+        full_name: document.getElementById("f_full_name").value.trim(),
+        tuition_code: document.getElementById("f_tuition_code").value.trim(),
+        phone: document.getElementById("f_phone").value.trim(),
+        group_name: document.getElementById("f_group_name").value,
+        photo_url: currentPhotoData,
+        hall_number: (() => {
+          const num = document.getElementById("f_hall_number").value.trim();
+          return num ? `سالن ${num} شرقی` : "";
+        })(),
+        room_number: document.getElementById("f_room_number").value.trim(),
+        fingerprint_number: document.getElementById("f_fingerprint_number").value.trim(),
+      };
+      ITEMS.forEach(it => {
+        const checked = document.getElementById("row_" + it.key).classList.contains("checked");
+        payload["item_" + it.key] = checked;
+        payload["item_" + it.key + "_count"] = checked ? (Number(document.getElementById("cnt_" + it.key)
+          .value) || 0) : 0;
+      });
+
+      if (!payload.full_name || !payload.tuition_code) {
+        showMsg("formMsg", "نام و نام خانوادگی و کد شهریه الزامی است.");
+        return;
+      }
+      showMsg("formMsg", "");
+      const btn = document.getElementById("saveBtn");
+      const btnOrigText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "در حال ذخیره...";
+      try {
+        if (editingId) {
+          await callRpc("rpc_update_student", { p_token: session.token, p_id: editingId, p_data: payload });
+          toast("تغییرات ذخیره شد.");
+        } else {
+          await callRpc("rpc_add_student", { p_token: session.token, p_data: payload });
+          toast("فرد جدید با موفقیت اضافه شد.");
+        }
+        resetForm();
+        await loadStudents();
+        goTab("list");
+      } catch (err) {
+        showMsg("formMsg", err.message);
+        btn.textContent = btnOrigText;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    window.askDeleteStudent = function(id, name) {
+      openConfirm(`حذف «${name}»`, "اطلاعات این فرد برای همیشه حذف می‌شود. مطمئن هستید?", async () => {
+        try {
+          await callRpc("rpc_delete_student", { p_token: session.token, p_id: id });
+          toast("حذف شد.");
+          loadStudents(normalizeDigits(document.getElementById("searchInput").value));
+        } catch (err) {
+          toast(err.message, true);
+        }
+      });
+    }
+
+    /* ========================= مدیریت ادمین‌ها ========================= */
+    let admins = [];
+    let editingAdminId = null;
+
+    async function loadAdmins() {
+      if (!session.admin.is_super) return;
+      const wrap = document.getElementById("adminsListWrap");
+      wrap.innerHTML = `<div class="skeleton" style="height:60px"></div>`;
+      try {
+        admins = await callRpc("rpc_list_admins", { p_token: session.token }) || [];
+        renderAdmins(admins);
+      } catch (err) {
+        wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    function renderAdmins(list) {
+      const wrap = document.getElementById("adminsListWrap");
+      if (list.length === 0) { wrap.innerHTML = ""; return; }
+      wrap.innerHTML = list.map(a => `
+        <div class="admin-row">
+          <div class="info">
+            <b>${esc(a.full_name)} ${a.is_super ? '<span class="super-tag">سوپر ادمین</span>' : ''}</b>
+            <span dir="ltr">@${esc(a.username)}</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="startEditAdmin('${a.id}')">ویرایش</button>
+            ${a.id === session.admin.id ? '' : `<button class="btn btn-danger btn-sm" onclick="askDeleteAdmin('${a.id}','${esc(a.full_name)}')">حذف</button>`}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function resetAdminForm() {
+      editingAdminId = null;
+      document.getElementById("adminFormTitle").textContent = "افزودن ادمین جدید";
+      document.getElementById("adminFormHint").textContent = "یک حساب کاربری برای همکار جدید بساز.";
+      document.getElementById("addAdminBtn").textContent = "افزودن ادمین";
+      document.getElementById("cancelEditAdminBtn").style.display = "none";
+      document.getElementById("a_password_label").textContent = "رمز عبور";
+      document.getElementById("a_password").placeholder = "حداقل ۴ کاراکتر";
+      document.getElementById("a_full_name").value = "";
+      document.getElementById("a_username").value = "";
+      document.getElementById("a_password").value = "";
+      document.getElementById("a_is_super").value = "false";
+      document.getElementById("a_is_super").disabled = false;
+      showMsg("adminMsg", "");
+    }
+
+    window.startEditAdmin = function(id) {
+      const a = admins.find(x => x.id === id);
+      if (!a) return;
+      editingAdminId = id;
+      document.getElementById("adminFormTitle").textContent = "ویرایش ادمین";
+      document.getElementById("adminFormHint").textContent = "برای تغییر ندادن رمز عبور، فیلد آن را خالی بگذار.";
+      document.getElementById("addAdminBtn").textContent = "ذخیره تغییرات";
+      document.getElementById("cancelEditAdminBtn").style.display = "inline-flex";
+      document.getElementById("a_password_label").textContent = "رمز عبور جدید";
+      document.getElementById("a_password").placeholder = "خالی = بدون تغییر";
+      document.getElementById("a_full_name").value = a.full_name || "";
+      document.getElementById("a_username").value = a.username || "";
+      document.getElementById("a_password").value = "";
+      document.getElementById("a_is_super").value = a.is_super ? "true" : "false";
+      // a super admin can't downgrade own role here
+      document.getElementById("a_is_super").disabled = (a.id === session.admin.id);
+      showMsg("adminMsg", "");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.getElementById("cancelEditAdminBtn").addEventListener("click", resetAdminForm);
+
+    document.getElementById("addAdminBtn").addEventListener("click", async () => {
+      const full_name = document.getElementById("a_full_name").value.trim();
+      const username = document.getElementById("a_username").value.trim();
+      const password = document.getElementById("a_password").value;
+      const is_super = document.getElementById("a_is_super").value === "true";
+      showMsg("adminMsg", "");
+
+      const btn = document.getElementById("addAdminBtn");
+
+      if (editingAdminId) {
+        if (!full_name || !username) {
+          showMsg("adminMsg", "نام و نام کاربری الزامی است.");
+          return;
+        }
+        btn.disabled = true;
+        try {
+          await callRpc("rpc_update_admin", {
+            p_token: session.token, p_admin_id: editingAdminId,
+            p_full_name: full_name, p_username: username,
+            p_password: password || null, p_is_super: is_super
+          });
+          toast("اطلاعات ادمین ذخیره شد.");
+          resetAdminForm();
+          loadAdmins();
+        } catch (err) {
+          showMsg("adminMsg", err.message);
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      if (!full_name || !username || !password) {
+        showMsg("adminMsg", "همه فیلدها الزامی است.");
+        return;
+      }
+      btn.disabled = true;
+      try {
+        await callRpc("rpc_add_admin", { p_token: session.token, p_username: username, p_password: password,
+          p_full_name: full_name, p_is_super: is_super });
+        toast("ادمین جدید اضافه شد.");
+        resetAdminForm();
+        loadAdmins();
+      } catch (err) {
+        showMsg("adminMsg", err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    window.askDeleteAdmin = function(id, name) {
+      openConfirm(`حذف ادمین «${name}»`, "این حساب کاربری دیگر نمی‌تواند وارد سامانه شود. مطمئن هستید?", async () => {
+        try {
+          await callRpc("rpc_delete_admin", { p_token: session.token, p_admin_id: id });
+          toast("ادمین حذف شد.");
+          loadAdmins();
+        } catch (err) {
+          toast(err.message, true);
+        }
+      });
+    }
+
+    /* ========================= ویرایش حساب خودم ========================= */
+    document.getElementById("myProfileBtn").addEventListener("click", () => {
+      document.getElementById("p_full_name").value = session.admin.full_name || "";
+      document.getElementById("p_username").value = session.admin.username || "";
+      document.getElementById("p_password").value = "";
+      showMsg("profileMsg", "");
+      document.getElementById("profileModal").classList.add("show");
+    });
+    document.getElementById("profileCancelBtn").addEventListener("click", () => {
+      document.getElementById("profileModal").classList.remove("show");
+    });
+    document.getElementById("profileModal").addEventListener("click", e => {
+      if (e.target.id === "profileModal") document.getElementById("profileModal").classList.remove("show");
+    });
+    document.getElementById("profileSaveBtn").addEventListener("click", async () => {
+      const full_name = document.getElementById("p_full_name").value.trim();
+      const username = document.getElementById("p_username").value.trim();
+      const password = document.getElementById("p_password").value;
+      showMsg("profileMsg", "");
+      if (!full_name || !username) {
+        showMsg("profileMsg", "نام و نام کاربری الزامی است.");
+        return;
+      }
+      const btn = document.getElementById("profileSaveBtn");
+      btn.disabled = true;
+      try {
+        const updated = await callRpc("rpc_update_admin", {
+          p_token: session.token, p_admin_id: session.admin.id,
+          p_full_name: full_name, p_username: username,
+          p_password: password || null, p_is_super: null
+        });
+        session.admin.full_name = updated.full_name;
+        session.admin.username = updated.username;
+        saveSession(session);
+        document.getElementById("whoName").textContent = session.admin.full_name;
+        document.getElementById("profileModal").classList.remove("show");
+        toast("اطلاعات حساب شما ذخیره شد.");
+      } catch (err) {
+        showMsg("profileMsg", err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    /* ========================= مودال تایید ========================= */
+    function openConfirm(title, text, action) {
+      document.getElementById("confirmTitle").textContent = title;
+      document.getElementById("confirmText").textContent = text;
+      confirmAction = action;
+      document.getElementById("confirmModal").classList.add("show");
+    }
+    document.getElementById("confirmNo").addEventListener("click", () => {
+      document.getElementById("confirmModal").classList.remove("show");
+      confirmAction = null;
+    });
+    document.getElementById("confirmYes").addEventListener("click", async () => {
+      document.getElementById("confirmModal").classList.remove("show");
+      if (confirmAction) await confirmAction();
+      confirmAction = null;
+    });
+    document.getElementById("confirmModal").addEventListener("click", e => {
+      if (e.target.id === "confirmModal") document.getElementById("confirmModal").classList.remove("show");
+    });
+  </script>
 </body>
 </html>
