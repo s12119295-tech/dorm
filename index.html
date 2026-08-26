@@ -239,6 +239,11 @@
   .form-card h2{font-size:16px;margin:0 0 4px;font-weight:800}
   .form-card p.hint{margin:0 0 18px;color:var(--ink-soft);font-size:12.5px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .room-input{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:11px;background:#fff;overflow:hidden;transition:border-color .15s, box-shadow .15s}
+  .room-input:focus-within{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,161,91,.18)}
+  .room-prefix{padding:12px 14px;font-size:15px;color:var(--ink-soft);font-weight:600;background:var(--cream);border-left:1.5px solid var(--line);white-space:nowrap}
+  .room-input input{border:none !important;box-shadow:none !important;padding:12px 14px;flex:1;min-width:0}
+  .room-input input:focus{box-shadow:none !important}
   @media (max-width:420px){.grid2{grid-template-columns:1fr}}
 
   .items-legend{
@@ -476,11 +481,20 @@
           </div>
           <div class="field">
             <label>شماره سالن</label>
-            <input id="f_hall_number" type="text" placeholder="مثال: سالن ۲">
+            <select id="f_hall_number">
+              <option value="">— انتخاب کنید —</option>
+            </select>
           </div>
           <div class="field">
             <label>شماره اتاق</label>
-            <input id="f_room_number" type="text" placeholder="مثال: اتاق ۵">
+            <div class="room-input">
+              <span class="room-prefix">اتاق</span>
+              <input id="f_room_number" type="text" inputmode="numeric" placeholder="مثال: ۵">
+            </div>
+          </div>
+          <div class="field">
+            <label>شماره انگشتی</label>
+            <input id="f_fingerprint_number" type="text" inputmode="numeric" placeholder="مثال: 123">
           </div>
         </div>
 
@@ -591,12 +605,13 @@ let editingId = null;
 let confirmAction = null;
 
 const GROUPS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "خارج"];
+const HALLS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "ادبیات استاد ابوالفضلی", "خارج ثامن"];
 
 const ITEMS = [
   { key:"spoon",   label:"قاشق", icon:'<path d="M12 2c-2 0-3.5 2-3.5 4.5S10 12 12 12s3.5-3 3.5-5.5S14 2 12 2z"/><path d="M12 12v10"/>' },
   { key:"blanket", label:"پتو",  icon:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 12h18M9 6v12"/>' },
   { key:"pillow",  label:"بالش", icon:'<rect x="3" y="7" width="18" height="10" rx="5"/>' },
-  { key:"dish",    label:"دیس",  icon:'<ellipse cx="12" cy="12" rx="9" ry="9"/><ellipse cx="12" cy="12" rx="4.5" ry="4.5"/>' },
+  { key:"dish",    label:"دیس",  icon:'<ellipse cx="12" cy="12" rx="9" ry="4.5"/><ellipse cx="12" cy="12" rx="4.3" ry="2.1"/>' },
   { key:"bowl",    label:"کاسه", icon:'<path d="M3 11a9 6 0 0 0 18 0"/><path d="M3 11h18"/>' },
 ];
 
@@ -682,6 +697,7 @@ function enterApp(){
   document.getElementById("whoRole").textContent = session.admin.is_super ? "سوپر ادمین" : "ادمین";
   document.getElementById("tabAdmins").style.display = session.admin.is_super ? "inline-block" : "none";
   buildGroupOptions();
+  buildHallOptions();
   buildItemsForm();
   loadStudents();
 }
@@ -759,6 +775,7 @@ function renderStudents(){
         ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
         ${st.hall_number ? `<span>سالن <b>${esc(st.hall_number)}</b></span>`:""}
         ${st.room_number ? `<span>اتاق <b>${esc(st.room_number)}</b></span>`:""}
+        ${st.fingerprint_number ? `<span>شماره انگشتی <b>${esc(st.fingerprint_number)}</b></span>`:""}
         ${st.phone ? `<span dir="ltr">${esc(st.phone)}</span>`:""}
       </div>
       <div class="checklist-mini">${chips}</div>
@@ -785,6 +802,7 @@ function exportRows(){
     "گروه": st.group_name || "",
     "شماره سالن": st.hall_number || "",
     "شماره اتاق": st.room_number || "",
+    "شماره انگشتی": st.fingerprint_number || "",
     "موبایل": st.phone || "",
     "لوازم تحویلی": itemsSummary(st),
   }));
@@ -1031,6 +1049,11 @@ function buildGroupOptions(){
   sel.innerHTML = `<option value="">— انتخاب کنید —</option>` +
     GROUPS.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
 }
+function buildHallOptions(){
+  const sel = document.getElementById("f_hall_number");
+  sel.innerHTML = `<option value="">— انتخاب کنید —</option>` +
+    HALLS.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
+}
 
 /* ========================= فرم لوازم ========================= */
 function buildItemsForm(){
@@ -1084,7 +1107,7 @@ function resetForm(){
   document.getElementById("formTitle").textContent = "افزودن فرد جدید";
   document.getElementById("saveBtn").textContent = "ثبت اطلاعات";
   document.getElementById("cancelEditBtn").style.display = "none";
-  ["full_name","tuition_code","phone","group_name","hall_number","room_number"].forEach(k=>{
+  ["full_name","tuition_code","phone","group_name","hall_number","room_number","fingerprint_number"].forEach(k=>{
     document.getElementById("f_"+k).value = "";
   });
   setPhotoPreview("");
@@ -1107,6 +1130,7 @@ window.editStudent = function(id){
   setPhotoPreview(st.photo_url || "");
   document.getElementById("f_hall_number").value = st.hall_number || "";
   document.getElementById("f_room_number").value = st.room_number || "";
+  document.getElementById("f_fingerprint_number").value = st.fingerprint_number || "";
   ITEMS.forEach(it => setItemState(it.key, st["item_"+it.key], st["item_"+it.key+"_count"]));
   showMsg("formMsg","");
   goTab("add");
@@ -1124,6 +1148,7 @@ document.getElementById("saveBtn").addEventListener("click", async ()=>{
     photo_url: currentPhotoData,
     hall_number: document.getElementById("f_hall_number").value.trim(),
     room_number: document.getElementById("f_room_number").value.trim(),
+    fingerprint_number: document.getElementById("f_fingerprint_number").value.trim(),
   };
   ITEMS.forEach(it => {
     const checked = document.getElementById("row_"+it.key).classList.contains("checked");
