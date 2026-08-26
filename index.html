@@ -1293,12 +1293,12 @@
             ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
             <h3>${esc(st.full_name)}</h3>
             <span class="code-pill">کد ${esc(st.tuition_code)}</span>
+            ${st.fingerprint_number ? `<span class="code-pill">اثر انگشت ${esc(st.fingerprint_number)}</span>`:""}
           </div>
           <div class="meta-row">
             ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
             ${st.hall_number ? `<span>سالن <b>${esc(st.hall_number)}</b></span>`:""}
             ${st.room_number ? `<span>اتاق <b>${esc(st.room_number)}</b></span>`:""}
-            ${st.fingerprint_number ? `<span>شماره انگشتی <b>${esc(st.fingerprint_number)}</b></span>`:""}
             ${st.phone ? `<span dir="ltr">${esc(st.phone)}</span>`:""}
           </div>
           <div class="checklist-mini">${chips}</div>
