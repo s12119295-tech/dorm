@@ -1113,7 +1113,7 @@
     let editingId = null;
     let confirmAction = null;
 
-    const GROUPS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "خارج", "ادبیات استاد ابوالفضلی"];
+    const GROUPS = ["ثامن 1", "ثامن 2", "ثامن 3", "ثامن 4", "ثامن 5", "دارالعلم", "خارج", "ادبیات استاد ابوالفضلی", "شبه قاره", "باقرالعلوم"];
 
     const ITEMS = [
       { key: "spoon", label: "قاشق", icon: '<path d="M12 2c-2 0-3.5 2-3.5 4.5S10 12 12 12s3.5-3 3.5-5.5S14 2 12 2z"/><path d="M12 12v10"/>' },
@@ -1256,6 +1256,7 @@
         `<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>`;
       try {
         students = await callRpc("rpc_list_students", { p_token: session.token, p_search: search || null });
+        sortStudentsByFingerprint();
         renderStudents();
       } catch (err) {
         wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
@@ -1270,6 +1271,18 @@
       searchTimer = setTimeout(() => loadStudents(normalizeDigits(e.target.value)), 350);
     });
 
+    function sortStudentsByFingerprint() {
+      students.sort((a, b) => {
+        const fa = parseInt(normalizeDigits(String(a.fingerprint_number || "")).replace(/[^0-9]/g, ""), 10);
+        const fb = parseInt(normalizeDigits(String(b.fingerprint_number || "")).replace(/[^0-9]/g, ""), 10);
+        const aHas = !isNaN(fa), bHas = !isNaN(fb);
+        if (aHas && bHas) return fa - fb;
+        if (aHas && !bHas) return -1;
+        if (!aHas && bHas) return 1;
+        return (a.full_name || "").localeCompare(b.full_name || "", "fa");
+      });
+    }
+
     function renderStudents() {
       const wrap = document.getElementById("listWrap");
       if (students.length === 0) {
@@ -1281,7 +1294,7 @@
           </div>`;
         return;
       }
-      wrap.innerHTML = students.map(st => {
+      wrap.innerHTML = students.map((st, idx) => {
         const chips = ITEMS.map(it => {
           const on = st["item_" + it.key];
           const count = st["item_" + it.key + "_count"];
@@ -1290,6 +1303,7 @@
         return `
         <div class="card" data-id="${st.id}">
           <div class="card-head">
+            <span class="code-pill">ردیف ${idx + 1}</span>
             ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
             <h3>${esc(st.full_name)}</h3>
             <span class="code-pill">کد ${esc(st.tuition_code)}</span>
