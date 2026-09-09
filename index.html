@@ -920,6 +920,7 @@
         <button data-tab="list" class="active">فهرست ساکنان</button>
         <button data-tab="add">افزودن فرد جدید</button>
         <button data-tab="admins" id="tabAdmins" style="display:none">مدیریت ادمین‌ها</button>
+        <button data-tab="notifs" id="tabNotifs">اعلان‌ها <span id="notifBadge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;margin-inline-start:4px">0</span></button>
       </nav>
     </header>
 
@@ -1057,6 +1058,43 @@
         </div>
 
         <div id="adminsListWrap"></div>
+      </section>
+
+      <!-- ---- NOTIFICATIONS ---- -->
+      <section class="section" id="sec-notifs">
+        <div class="form-card" id="notifComposeCard" style="display:none;margin-bottom:16px">
+          <h2>ارسال اعلان جدید</h2>
+          <p class="hint">اعلان را برای یک یا چند ادمین ارسال کنید.</p>
+          <div class="field">
+            <label>گیرندگان</label>
+            <div style="margin-bottom:8px">
+              <label style="display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer">
+                <input type="checkbox" id="n_select_all"> انتخاب همه ادمین‌ها
+              </label>
+            </div>
+            <div id="n_recipients" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:10px"></div>
+          </div>
+          <div class="field">
+            <label>عنوان اعلان</label>
+            <input id="n_title" type="text" placeholder="مثال: هماهنگی جلسه فردا">
+          </div>
+          <div class="field">
+            <label>متن پیام</label>
+            <textarea id="n_message" rows="4" style="width:100%;resize:vertical;font-family:inherit;border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="متن اعلان را وارد کنید..."></textarea>
+          </div>
+          <div class="msg error" id="notifMsg"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-block" id="sendNotifBtn">ارسال اعلان</button>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-bottom:14px">
+          <h2 style="margin:0;flex:1">صندوق اعلان‌های من</h2>
+          <button class="btn btn-gold btn-sm icon-only" id="refreshNotifsBtn" title="بازخوانی" aria-label="بازخوانی">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
+        <div id="notifsListWrap"></div>
       </section>
     </main>
   </div>
@@ -1205,6 +1243,7 @@
 
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       try { if (session) await callRpc("rpc_logout", { p_token: session.token }); } catch (e) {}
+      clearInterval(window._notifPoll);
       clearSession();
       location.reload();
     });
@@ -1216,9 +1255,13 @@
       document.getElementById("whoName").textContent = session.admin.full_name;
       document.getElementById("whoRole").textContent = session.admin.is_super ? "سوپر ادمین" : "ادمین";
       document.getElementById("tabAdmins").style.display = session.admin.is_super ? "inline-block" : "none";
+      document.getElementById("notifComposeCard").style.display = session.admin.is_super ? "block" : "none";
       buildGroupOptions();
       buildItemsForm();
       loadStudents();
+      refreshUnreadBadge();
+      clearInterval(window._notifPoll);
+      window._notifPoll = setInterval(refreshUnreadBadge, 30000);
     }
 
     async function checkSession() {
@@ -1243,6 +1286,7 @@
       if (btn.dataset.tab === "add" && !editingId) resetForm();
       if (btn.dataset.tab === "admins") { if (!editingAdminId) resetAdminForm();
         loadAdmins(); }
+      if (btn.dataset.tab === "notifs") loadNotifsTab();
     });
 
     function goTab(tab) {
@@ -1403,58 +1447,106 @@
       try {
         const rows = exportRows();
         const headers = ["عکس", ...Object.keys(rows[0])];
-        const holder = document.createElement("div");
-        holder.style.cssText =
-          "position:fixed;left:-9999px;top:0;width:1050px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial";
-        holder.innerHTML = `
-          <div dir="rtl">
+        const HOLDER_W = 1050;
+
+        function photoCellHtml(st) {
+          return st && st.photo_url
+            ? `<img class="pdf-photo" src="${esc(st.photo_url)}" crossorigin="anonymous" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;margin:0 auto">`
+            : `<div style="width:34px;height:34px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">${esc((st && st.full_name || "?").trim().charAt(0))}</div>`;
+        }
+        function rowHtml(r, i) {
+          const st = students[i];
+          return `<tr style="background:${i%2?'#F7F3EA':'#fff'}">
+            <td style="border:1px solid #999;padding:6px;text-align:center">${photoCellHtml(st)}</td>
+            ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}
+          </tr>`;
+        }
+        function headerRowHtml() {
+          return `<tr>${headers.map(h=>`<th style="border:1px solid #999;padding:8px;background:#155050;color:#fff">${h}</th>`).join("")}</tr>`;
+        }
+        function titleBlockHtml() {
+          return `<div id="pdfTitleBlock">
             <h2 style="text-align:center;margin:0 0 4px">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
             <p style="text-align:center;color:#666;margin:0 0 16px">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")} — تعداد: ${rows.length} نفر</p>
+          </div>`;
+        }
+        function pageHtml(indices, includeTitle) {
+          return `<div dir="rtl">
+            ${includeTitle ? titleBlockHtml() : ""}
             <table dir="rtl" style="width:100%;border-collapse:collapse;font-size:13px">
-              <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:8px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
-              <tbody>${rows.map((r,i)=>{
-                const st = students[i];
-                const photoCell = st && st.photo_url
-                  ? `<img class="pdf-photo" src="${esc(st.photo_url)}" crossorigin="anonymous" style="width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;margin:0 auto">`
-                  : `<div style="width:34px;height:34px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto">${esc((st && st.full_name || "?").trim().charAt(0))}</div>`;
-                return `<tr style="background:${i%2?'#F7F3EA':'#fff'}">
-                  <td style="border:1px solid #999;padding:6px;text-align:center">${photoCell}</td>
-                  ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:7px">${esc(r[h])}</td>`).join("")}
-                </tr>`;
-              }).join("")}</tbody>
+              <thead>${headerRowHtml()}</thead>
+              <tbody>${indices.map(i => rowHtml(rows[i], i)).join("")}</tbody>
             </table>
           </div>`;
-        document.body.appendChild(holder);
-
-        const imgs = Array.from(holder.querySelectorAll("img.pdf-photo"));
-        await Promise.all(imgs.map(img => new Promise(resolve => {
-          if (img.complete) { resolve(); return; }
-          img.onload = () => resolve();
-          img.onerror = () => { img.style.display = "none";
-            resolve(); };
-        })));
-
-        const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff", useCORS: true });
-        document.body.removeChild(holder);
+        }
+        async function waitPhotos(holder) {
+          const imgs = Array.from(holder.querySelectorAll("img.pdf-photo"));
+          await Promise.all(imgs.map(img => new Promise(resolve => {
+            if (img.complete) { resolve(); return; }
+            img.onload = () => resolve();
+            img.onerror = () => { img.style.display = "none";
+              resolve(); };
+          })));
+        }
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
-        const imgW = pageW - 16;
-        const imgH = (canvas.height * imgW) / canvas.width;
-        let heightLeft = imgH;
-        let position = 8;
-        const imgData = canvas.toDataURL("image/png");
+        const MARGIN = 8;
+        const imgW = pageW - MARGIN * 2;
+        const mmPerPx = imgW / HOLDER_W;
+        const availablePx = (pageH - MARGIN * 2) / mmPerPx;
 
-        pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
-        heightLeft -= (pageH - 16);
-        while (heightLeft > 0) {
-          position = heightLeft - imgH + 8;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 8, position, imgW, imgH);
-          heightLeft -= (pageH - 16);
+        /* --- pass 1: measure real rendered heights of the title block, the
+           header row and every single resident row, so we can decide exactly
+           where a page should end (only ever between rows, never inside one) --- */
+        const measurer = document.createElement("div");
+        measurer.style.cssText =
+          `position:fixed;left:-9999px;top:0;width:${HOLDER_W}px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial`;
+        measurer.innerHTML = pageHtml(rows.map((_, i) => i), true);
+        document.body.appendChild(measurer);
+        const titleBlockH = measurer.querySelector("#pdfTitleBlock").getBoundingClientRect().height;
+        const headerRowH = measurer.querySelector("thead tr").getBoundingClientRect().height;
+        const rowHeights = Array.from(measurer.querySelectorAll("tbody tr")).map(tr => tr.getBoundingClientRect().height);
+        document.body.removeChild(measurer);
+
+        /* --- decide page groupings: a new page starts before any row that
+           would otherwise overflow past the bottom margin --- */
+        const pages = [];
+        let curIndices = [];
+        let curHeight = titleBlockH + headerRowH;
+        let isFirstPage = true;
+        for (let i = 0; i < rowHeights.length; i++) {
+          const h = rowHeights[i];
+          if (curIndices.length > 0 && curHeight + h > availablePx) {
+            pages.push({ indices: curIndices, isFirst: isFirstPage });
+            isFirstPage = false;
+            curIndices = [];
+            curHeight = headerRowH;
+          }
+          curIndices.push(i);
+          curHeight += h;
         }
+        if (curIndices.length > 0) pages.push({ indices: curIndices, isFirst: isFirstPage });
+
+        /* --- pass 2: render each page's whole rows as its own image --- */
+        for (let p = 0; p < pages.length; p++) {
+          const { indices, isFirst } = pages[p];
+          const holder = document.createElement("div");
+          holder.style.cssText =
+            `position:fixed;left:-9999px;top:0;width:${HOLDER_W}px;background:#fff;padding:20px;font-family:Vazirmatn,Tahoma,Arial`;
+          holder.innerHTML = pageHtml(indices, isFirst);
+          document.body.appendChild(holder);
+          await waitPhotos(holder);
+          const canvas = await html2canvas(holder, { scale: 2, backgroundColor: "#fff", useCORS: true });
+          document.body.removeChild(holder);
+          const pageImgH = (canvas.height * imgW) / canvas.width;
+          const imgData = canvas.toDataURL("image/png");
+          if (p > 0) pdf.addPage();
+          pdf.addImage(imgData, "PNG", MARGIN, MARGIN, imgW, pageImgH);
+        }
+
         pdf.save(exportFileName("pdf"));
       } catch (err) {
         toast("خطا در ساخت PDF: " + err.message, true);
@@ -1955,6 +2047,126 @@
     document.getElementById("confirmModal").addEventListener("click", e => {
       if (e.target.id === "confirmModal") document.getElementById("confirmModal").classList.remove("show");
     });
+    /* ========================= اعلان‌ها ========================= */
+    let notifRecipients = [];
+    let notifications = [];
+
+    function timeAgoFa(iso) {
+      try { return new Date(iso).toLocaleString("fa-IR"); } catch (e) { return ""; }
+    }
+
+    async function loadNotifRecipients() {
+      if (!session.admin.is_super) return;
+      const wrap = document.getElementById("n_recipients");
+      wrap.innerHTML = `<div class="skeleton"></div>`;
+      try {
+        notifRecipients = (await callRpc("rpc_list_admins", { p_token: session.token }) || [])
+          .filter(a => a.id !== session.admin.id);
+        if (notifRecipients.length === 0) {
+          wrap.innerHTML = `<div class="empty"><p>ادمین دیگری برای ارسال اعلان وجود ندارد.</p></div>`;
+          return;
+        }
+        wrap.innerHTML = notifRecipients.map(a => `
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="checkbox" class="n_recipient_cb" value="${esc(a.id)}">
+            ${esc(a.full_name)}${a.is_super ? ' <span class="super-tag">سوپر ادمین</span>' : ''}
+          </label>`).join("");
+        document.getElementById("n_select_all").checked = false;
+      } catch (err) {
+        wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    document.getElementById("n_select_all").addEventListener("change", e => {
+      document.querySelectorAll(".n_recipient_cb").forEach(cb => cb.checked = e.target.checked);
+    });
+
+    document.getElementById("sendNotifBtn").addEventListener("click", async () => {
+      showMsg("notifMsg", "");
+      const ids = Array.from(document.querySelectorAll(".n_recipient_cb:checked")).map(cb => cb.value);
+      const title = document.getElementById("n_title").value.trim();
+      const message = document.getElementById("n_message").value.trim();
+      if (ids.length === 0) { showMsg("notifMsg", "حداقل یک گیرنده را انتخاب کنید."); return; }
+      if (!title || !message) { showMsg("notifMsg", "عنوان و متن پیام را وارد کنید."); return; }
+      const btn = document.getElementById("sendNotifBtn");
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = "در حال ارسال...";
+      try {
+        await callRpc("rpc_send_notification", {
+          p_token: session.token, p_admin_ids: ids, p_title: title, p_message: message
+        });
+        document.getElementById("n_title").value = "";
+        document.getElementById("n_message").value = "";
+        document.querySelectorAll(".n_recipient_cb").forEach(cb => cb.checked = false);
+        document.getElementById("n_select_all").checked = false;
+        toast("اعلان با موفقیت ارسال شد.");
+        loadNotifications();
+      } catch (err) {
+        showMsg("notifMsg", err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    });
+
+    async function loadNotifications() {
+      const wrap = document.getElementById("notifsListWrap");
+      wrap.innerHTML = `<div class="skeleton"></div><div class="skeleton"></div>`;
+      try {
+        notifications = await callRpc("rpc_list_notifications", { p_token: session.token }) || [];
+        renderNotifications();
+      } catch (err) {
+        wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    function renderNotifications() {
+      const wrap = document.getElementById("notifsListWrap");
+      if (notifications.length === 0) {
+        wrap.innerHTML = `<div class="empty"><p>اعلانی برای شما ارسال نشده است.</p></div>`;
+        return;
+      }
+      wrap.innerHTML = notifications.map(n => `
+        <div class="form-card" data-id="${esc(n.id)}" style="margin-bottom:10px;${n.is_read ? '' : 'border-inline-start:4px solid var(--danger)'}">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <b>${esc(n.title)}</b>
+            ${n.is_read ? '' : '<span class="super-tag" style="background:var(--danger)">جدید</span>'}
+          </div>
+          <p style="margin:8px 0;white-space:pre-wrap">${esc(n.message)}</p>
+          <p class="hint" style="margin:0">از طرف: ${esc(n.sender_name || "سوپر ادمین")} — ${timeAgoFa(n.created_at)}</p>
+        </div>`).join("");
+      wrap.querySelectorAll("[data-id]").forEach(el => {
+        el.addEventListener("click", () => markNotifRead(el.dataset.id));
+      });
+    }
+
+    async function markNotifRead(id) {
+      const n = notifications.find(x => String(x.id) === String(id));
+      if (!n || n.is_read) return;
+      try {
+        await callRpc("rpc_mark_notification_read", { p_token: session.token, p_id: id });
+        n.is_read = true;
+        renderNotifications();
+        refreshUnreadBadge();
+      } catch (e) {}
+    }
+
+    async function refreshUnreadBadge() {
+      try {
+        const count = await callRpc("rpc_unread_notifications_count", { p_token: session.token });
+        const badge = document.getElementById("notifBadge");
+        if (count > 0) { badge.style.display = "inline-block";
+          badge.textContent = count > 99 ? "99+" : String(count); } else { badge.style.display = "none"; }
+      } catch (e) {}
+    }
+
+    function loadNotifsTab() {
+      if (session.admin.is_super) loadNotifRecipients();
+      loadNotifications();
+    }
+
+    document.getElementById("refreshNotifsBtn").addEventListener("click", loadNotifications);
   </script>
 </body>
 </html>
