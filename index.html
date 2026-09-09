@@ -921,6 +921,7 @@
         <button data-tab="add">افزودن فرد جدید</button>
         <button data-tab="admins" id="tabAdmins" style="display:none">مدیریت ادمین‌ها</button>
         <button data-tab="notifs" id="tabNotifs">اعلان‌ها <span id="notifBadge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;margin-inline-start:4px">0</span></button>
+        <button data-tab="tickets" id="tabTickets">تیکت‌ها <span id="ticketBadge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;margin-inline-start:4px">0</span></button>
       </nav>
     </header>
 
@@ -1095,6 +1096,33 @@
           </button>
         </div>
         <div id="notifsListWrap"></div>
+      </section>
+
+      <!-- ---- TICKETS ---- -->
+      <section class="section" id="sec-tickets">
+        <div class="form-card" style="margin-bottom:16px">
+          <h2>ارسال تیکت جدید به سوپر ادمین</h2>
+          <div class="field">
+            <label>موضوع</label>
+            <input id="t_subject" type="text" placeholder="مثال: مشکل در ثبت ساکن جدید">
+          </div>
+          <div class="field">
+            <label>متن پیام</label>
+            <textarea id="t_message" rows="4" style="width:100%;resize:vertical;font-family:inherit;border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="توضیح بدهید..."></textarea>
+          </div>
+          <div class="msg error" id="ticketMsg"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary btn-block" id="sendTicketBtn">ارسال تیکت</button>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-bottom:14px">
+          <h2 style="margin:0;flex:1" id="ticketsListTitle">تیکت‌های من</h2>
+          <button class="btn btn-gold btn-sm icon-only" id="refreshTicketsBtn" title="بازخوانی" aria-label="بازخوانی">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
+        <div id="ticketsListWrap"></div>
       </section>
     </main>
   </div>
@@ -1287,6 +1315,7 @@
       if (btn.dataset.tab === "admins") { if (!editingAdminId) resetAdminForm();
         loadAdmins(); }
       if (btn.dataset.tab === "notifs") loadNotifsTab();
+      if (btn.dataset.tab === "tickets") loadTicketsTab();
     });
 
     function goTab(tab) {
@@ -2167,6 +2196,151 @@
     }
 
     document.getElementById("refreshNotifsBtn").addEventListener("click", loadNotifications);
+
+    /* ========================= تیکت‌ها ========================= */
+    let tickets = [];
+    let openThreadId = null;
+
+    function statusBadgeHtml(status) {
+      return status === "closed"
+        ? `<span class="super-tag" style="background:#8a8a8a">بسته‌شده</span>`
+        : `<span class="super-tag" style="background:var(--accent,#155050)">باز</span>`;
+    }
+
+    document.getElementById("sendTicketBtn").addEventListener("click", async () => {
+      showMsg("ticketMsg", "");
+      const subject = document.getElementById("t_subject").value.trim();
+      const message = document.getElementById("t_message").value.trim();
+      if (!subject || !message) { showMsg("ticketMsg", "موضوع و متن پیام را وارد کنید."); return; }
+      const btn = document.getElementById("sendTicketBtn");
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = "در حال ارسال...";
+      try {
+        await callRpc("rpc_create_ticket", { p_token: session.token, p_subject: subject, p_message: message });
+        document.getElementById("t_subject").value = "";
+        document.getElementById("t_message").value = "";
+        toast("تیکت با موفقیت ارسال شد.");
+        loadTickets();
+      } catch (err) {
+        showMsg("ticketMsg", err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
+    });
+
+    async function loadTickets() {
+      document.getElementById("ticketsListTitle").textContent = session.admin.is_super ? "همه‌ی تیکت‌ها" : "تیکت‌های من";
+      const wrap = document.getElementById("ticketsListWrap");
+      wrap.innerHTML = `<div class="skeleton"></div><div class="skeleton"></div>`;
+      try {
+        tickets = await callRpc("rpc_list_tickets", { p_token: session.token }) || [];
+        renderTickets();
+      } catch (err) {
+        wrap.innerHTML = `<div class="empty"><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    function renderTickets() {
+      const wrap = document.getElementById("ticketsListWrap");
+      if (tickets.length === 0) {
+        wrap.innerHTML = `<div class="empty"><p>تیکتی وجود ندارد.</p></div>`;
+        return;
+      }
+      wrap.innerHTML = tickets.map(t => `
+        <div class="form-card ticket-card" data-id="${esc(t.id)}" style="margin-bottom:10px;cursor:pointer">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <b>${esc(t.subject)}</b>
+            ${statusBadgeHtml(t.status)}
+          </div>
+          ${session.admin.is_super ? `<p class="hint" style="margin:6px 0 0">از طرف: ${esc(t.admin_name)}</p>` : ""}
+          <p class="hint" style="margin:4px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.last_message || "")}</p>
+          <p class="hint" style="margin:4px 0 0">${timeAgoFa(t.updated_at)} — ${t.message_count} پیام</p>
+          <div class="ticket-thread" id="thread-${esc(t.id)}" style="display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px"></div>
+        </div>`).join("");
+
+      wrap.querySelectorAll(".ticket-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          if (e.target.closest("textarea, button, input")) return;
+          toggleThread(card.dataset.id);
+        });
+      });
+    }
+
+    async function toggleThread(id) {
+      const box = document.getElementById("thread-" + id);
+      if (!box) return;
+      if (openThreadId === id) { box.style.display = "none";
+        openThreadId = null;
+        return; }
+      document.querySelectorAll(".ticket-thread").forEach(b => b.style.display = "none");
+      openThreadId = id;
+      box.style.display = "block";
+      box.innerHTML = `<div class="skeleton"></div>`;
+      try {
+        const thread = await callRpc("rpc_get_ticket_thread", { p_token: session.token, p_ticket_id: id });
+        const msgsHtml = thread.messages.map(m => `
+          <div style="margin-bottom:10px;text-align:${m.is_super_sender ? 'start' : 'end'}">
+            <div style="display:inline-block;max-width:85%;padding:8px 12px;border-radius:10px;background:${m.is_super_sender ? '#EFEAE0' : '#DDEDEA'};text-align:right">
+              <div style="white-space:pre-wrap">${esc(m.message)}</div>
+              <div class="hint" style="margin:4px 0 0;font-size:11px">${esc(m.sender_name)} — ${timeAgoFa(m.created_at)}</div>
+            </div>
+          </div>`).join("");
+        const isOpen = thread.status !== "closed";
+        const canReply = isOpen && (session.admin.is_super || thread.admin_id === session.admin.id);
+        box.innerHTML = `
+          <div style="max-height:320px;overflow:auto;margin-bottom:10px">${msgsHtml || '<p class="hint">پیامی وجود ندارد.</p>'}</div>
+          ${canReply ? `
+            <textarea class="t_reply_box" rows="2" style="width:100%;resize:vertical;font-family:inherit;border:1px solid var(--line);border-radius:10px;padding:8px" placeholder="پاسخ خود را بنویسید..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-primary btn-sm t_reply_send">ارسال پاسخ</button>
+              ${session.admin.is_super ? `<button class="btn btn-sm t_close_ticket" style="background:#8a2222;color:#fff">بستن تیکت</button>` : ""}
+            </div>` : (session.admin.is_super && isOpen === false ? `<p class="hint">این تیکت بسته شده است.</p>` : "")}
+        `;
+        if (canReply) {
+          box.querySelector(".t_reply_send").addEventListener("click", async () => {
+            const ta = box.querySelector(".t_reply_box");
+            const msg = ta.value.trim();
+            if (!msg) return;
+            const sendBtn = box.querySelector(".t_reply_send");
+            sendBtn.disabled = true;
+            try {
+              await callRpc("rpc_reply_ticket", { p_token: session.token, p_ticket_id: id, p_message: msg });
+              await loadTickets();
+              openThreadId = null;
+              toggleThread(id);
+            } catch (err) {
+              toast(err.message, true);
+            } finally {
+              sendBtn.disabled = false;
+            }
+          });
+          const closeBtn = box.querySelector(".t_close_ticket");
+          if (closeBtn) closeBtn.addEventListener("click", async () => {
+            if (!confirm("این تیکت بسته شود؟")) return;
+            closeBtn.disabled = true;
+            try {
+              await callRpc("rpc_close_ticket", { p_token: session.token, p_ticket_id: id });
+              toast("تیکت بسته شد.");
+              await loadTickets();
+              openThreadId = null;
+              toggleThread(id);
+            } catch (err) {
+              toast(err.message, true);
+            }
+          });
+        }
+      } catch (err) {
+        box.innerHTML = `<p class="hint">${esc(err.message)}</p>`;
+      }
+    }
+
+    function loadTicketsTab() {
+      loadTickets();
+    }
+
+    document.getElementById("refreshTicketsBtn").addEventListener("click", loadTickets);
   </script>
 </body>
 </html>
