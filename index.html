@@ -1089,7 +1089,7 @@
           </div>
         </div>
 
-        <div class="toolbar" style="margin-bottom:14px">
+        <div class="toolbar" style="margin-bottom:14px" id="notifInboxHeader">
           <h2 style="margin:0;flex:1">صندوق اعلان‌های من</h2>
           <button class="btn btn-gold btn-sm icon-only" id="refreshNotifsBtn" title="بازخوانی" aria-label="بازخوانی">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -1100,7 +1100,7 @@
 
       <!-- ---- TICKETS ---- -->
       <section class="section" id="sec-tickets">
-        <div class="form-card" style="margin-bottom:16px">
+        <div class="form-card" style="margin-bottom:16px" id="ticketComposeCard">
           <h2>ارسال تیکت جدید به سوپر ادمین</h2>
           <div class="field">
             <label>موضوع</label>
@@ -1284,6 +1284,9 @@
       document.getElementById("whoRole").textContent = session.admin.is_super ? "سوپر ادمین" : "ادمین";
       document.getElementById("tabAdmins").style.display = session.admin.is_super ? "inline-block" : "none";
       document.getElementById("notifComposeCard").style.display = session.admin.is_super ? "block" : "none";
+      document.getElementById("notifInboxHeader").style.display = session.admin.is_super ? "none" : "flex";
+      document.getElementById("notifsListWrap").style.display = session.admin.is_super ? "none" : "block";
+      document.getElementById("ticketComposeCard").style.display = session.admin.is_super ? "none" : "block";
       buildGroupOptions();
       buildItemsForm();
       loadStudents();
