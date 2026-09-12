@@ -1379,10 +1379,11 @@
         return `
         <div class="card" data-id="${st.id}">
           <div class="card-head">
-            <span class="code-pill">ردیف ${esc(st.fingerprint_number || "—")}</span>
+            <span class="code-pill">ردیف ${idx + 1}</span>
             ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
             <h3>${esc(st.full_name)}</h3>
             <span class="code-pill">کد ${esc(st.tuition_code)}</span>
+            ${st.fingerprint_number ? `<span class="code-pill">اثر انگشت ${esc(st.fingerprint_number)}</span>`:""}
           </div>
           <div class="meta-row">
             ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
@@ -1409,12 +1410,13 @@
 
     function exportRows() {
       return students.map((st, i) => ({
-        "ردیف": st.fingerprint_number || "",
+        "ردیف": i + 1,
         "نام و نام خانوادگی": st.full_name || "",
         "کد شهریه": st.tuition_code || "",
         "گروه": st.group_name || "",
         "شماره سالن": st.hall_number || "",
         "شماره اتاق": st.room_number || "",
+        "شماره انگشتی": st.fingerprint_number || "",
         "موبایل": st.phone || "",
         "لوازم تحویلی": itemsSummary(st),
       }));
