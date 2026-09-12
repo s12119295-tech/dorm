@@ -1379,11 +1379,10 @@
         return `
         <div class="card" data-id="${st.id}">
           <div class="card-head">
-            <span class="code-pill">ردیف ${idx + 1}</span>
+            <span class="code-pill">ردیف ${esc(st.fingerprint_number || "—")}</span>
             ${st.photo_url ? `<img class="avatar" src="${esc(st.photo_url)}" alt="">` : `<div class="avatar avatar-empty">${esc((st.full_name||"?").trim().charAt(0))}</div>`}
             <h3>${esc(st.full_name)}</h3>
             <span class="code-pill">کد ${esc(st.tuition_code)}</span>
-            ${st.fingerprint_number ? `<span class="code-pill">اثر انگشت ${esc(st.fingerprint_number)}</span>`:""}
           </div>
           <div class="meta-row">
             ${st.group_name ? `<span>گروه <b>${esc(st.group_name)}</b></span>`:""}
@@ -1410,13 +1409,12 @@
 
     function exportRows() {
       return students.map((st, i) => ({
-        "ردیف": i + 1,
+        "ردیف": st.fingerprint_number || "",
         "نام و نام خانوادگی": st.full_name || "",
         "کد شهریه": st.tuition_code || "",
         "گروه": st.group_name || "",
         "شماره سالن": st.hall_number || "",
         "شماره اتاق": st.room_number || "",
-        "شماره انگشتی": st.fingerprint_number || "",
         "موبایل": st.phone || "",
         "لوازم تحویلی": itemsSummary(st),
       }));
@@ -1449,25 +1447,75 @@
       XLSX.writeFile(wb, exportFileName("xlsx"));
     });
 
-    document.getElementById("exportWordBtn").addEventListener("click", () => {
+    document.getElementById("exportWordBtn").addEventListener("click", async () => {
       if (students.length === 0) { toast("لیستی برای خروجی وجود ندارد.", true); return; }
-      const rows = exportRows();
-      const headers = Object.keys(rows[0]);
-      const tableHtml = `
-        <table dir="rtl" style="width:100%;border-collapse:collapse;font-family:Tahoma,Arial;font-size:12px">
-          <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:6px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
-          <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td style="border:1px solid #999;padding:6px">${esc(r[h])}</td>`).join("")}</tr>`).join("")}</tbody>
-        </table>`;
-      const docHtml = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="utf-8"><title>فهرست ساکنان</title></head>
-        <body dir="rtl" style="font-family:Tahoma,Arial">
-          <h2 style="text-align:center">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
-          <p style="text-align:center;color:#666">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")}</p>
-          ${tableHtml}
-        </body></html>`;
-      const blob = new Blob(['\ufeff', docHtml], { type: "application/msword" });
-      downloadBlob(blob, exportFileName("doc"));
+      const btn = document.getElementById("exportWordBtn");
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "در حال ساخت...";
+      try {
+        const rows = exportRows();
+        const headers = ["عکس", ...Object.keys(rows[0])];
+
+        async function toDataUrl(url) {
+          try {
+            const res = await fetch(url, { mode: "cors" });
+            const blob = await res.blob();
+            return await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          } catch (e) { return null; }
+        }
+
+        const photoDataUrls = await Promise.all(
+          students.map(st => st && st.photo_url ? toDataUrl(st.photo_url) : Promise.resolve(null))
+        );
+
+        function photoCellHtml(st, dataUrl) {
+          if (dataUrl) {
+            return `<img src="${dataUrl}" width="45" height="45" style="border-radius:50%;object-fit:cover">`;
+          }
+          const initial = esc((st && st.full_name || "?").trim().charAt(0));
+          return `<div style="width:45px;height:45px;border-radius:50%;background:#E4C98A;color:#0F3A3A;font-weight:bold;text-align:center;line-height:45px;font-family:Vazirmatn,Tahoma,Arial">${initial}</div>`;
+        }
+
+        const tableHtml = `
+          <table dir="rtl" style="width:100%;border-collapse:collapse;font-family:Vazirmatn,Tahoma,Arial;font-size:12px">
+            <thead><tr>${headers.map(h=>`<th style="border:1px solid #999;padding:6px;background:#155050;color:#fff">${h}</th>`).join("")}</tr></thead>
+            <tbody>${rows.map((r, i) => {
+              const st = students[i];
+              return `<tr>
+                <td style="border:1px solid #999;padding:6px;text-align:center">${photoCellHtml(st, photoDataUrls[i])}</td>
+                ${headers.slice(1).map(h=>`<td style="border:1px solid #999;padding:6px">${esc(r[h])}</td>`).join("")}
+              </tr>`;
+            }).join("")}</tbody>
+          </table>`;
+
+        const docHtml = `
+          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+          <head>
+            <meta charset="utf-8">
+            <title>فهرست ساکنان</title>
+            <style>
+              body, table, th, td, p, h2 { font-family: Vazirmatn, Tahoma, Arial; }
+            </style>
+          </head>
+          <body dir="rtl" style="font-family:Vazirmatn,Tahoma,Arial">
+            <h2 style="text-align:center">فهرست ساکنان خوابگاه مدرسه آیت‌الله خویی</h2>
+            <p style="text-align:center;color:#666">تاریخ تهیه: ${new Date().toLocaleDateString("fa-IR")} — تعداد: ${rows.length} نفر</p>
+            ${tableHtml}
+          </body></html>`;
+        const blob = new Blob(['\ufeff', docHtml], { type: "application/msword" });
+        downloadBlob(blob, exportFileName("doc"));
+      } catch (err) {
+        toast("خطا در ساخت خروجی ورد: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
     });
 
     document.getElementById("exportPdfBtn").addEventListener("click", async () => {
